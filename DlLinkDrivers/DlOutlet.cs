@@ -11,12 +11,12 @@ using System.Text.Json;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
-    public class DlOutlet(string name, int outletNumber, IPluginOptionsAccessor pluginSettings) : BaseINPC, IWritableSwitch {
+    public class DlOutlet(string name, int outletNumber, IPluginOptionsAccessor pluginSettings, HttpClient mockClient = null) : BaseINPC, IWritableSwitch {
 
         public async Task<bool> Poll() {
             var success = await Task.Run((async () => {
                 SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
-                var httpClient = new HttpClient(handler);
+                var httpClient = this.httpClient ?? new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -40,7 +40,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         async Task IWritableSwitch.SetValue() {
             SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
-            var httpClient = new HttpClient(handler);
+            var httpClient = this.httpClient ?? new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
 
             bool valueToSet = Math.Abs(this.TargetValue - 1d) < Double.Epsilon;
@@ -97,5 +97,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 RaisePropertyChanged();
             }
         }
+
+        private readonly HttpClient httpClient = mockClient;
     }
 }

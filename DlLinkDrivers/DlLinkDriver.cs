@@ -121,6 +121,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             throw new NotImplementedException();
         }
 
-        private HttpClient httpClient = mockClient;
+        private readonly HttpClient httpClient = mockClient;
     }
 }
