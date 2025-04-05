@@ -15,13 +15,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         public async Task<bool> Poll() {
             var success = await Task.Run((async () => {
-                var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-                var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-                var serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
-
-                var handler = new HttpClientHandler() {
-                    Credentials = new NetworkCredential(userName, password)
-                };
+                SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
                 var httpClient = new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -45,13 +39,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         async Task IWritableSwitch.SetValue() {
-            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-            var serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
-
-            var handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
+            SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
             var httpClient = new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
 
@@ -67,6 +55,15 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 Logger.Error($"Response: {responseBody}");
                 return;
             }
+        }
+
+        private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
+            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
+            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
+            serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
+            handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
         }
 
         public short Id { get; private set; }

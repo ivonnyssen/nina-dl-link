@@ -20,7 +20,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
     /// The DeviceProvider will return an instance of this class as a sample weather device
     /// For this example the weather data will generate random numbers
     /// </summary>
-    public class DlLinkDriver(string deviceId, IPluginOptionsAccessor pluginSettings) : BaseINPC, ISwitchHub {
+    public class DlLinkDriver(string deviceId, IPluginOptionsAccessor pluginSettings, HttpClient mockClient = null) : BaseINPC, ISwitchHub {
         private readonly ICollection<ISwitch> switches = [];
 
         ICollection<ISwitch> ISwitchHub.Switches => switches;
@@ -52,29 +52,30 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         public async Task<bool> Connect(CancellationToken token) {
-            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-            var serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
-
-            var handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
-            var httpClient = new HttpClient(handler);
+            SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+            var httpClient = this.httpClient ?? new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            var response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/all;/name/", token);
-            var responseBody = await response.Content.ReadAsStringAsync(token);
-            if (response.StatusCode != HttpStatusCode.MultiStatus) {
-                Logger.Error($"Response: {response.StatusCode}");
-                Logger.Error($"Response: {responseBody}");
-                Logger.Error($"Failed to connect to {serverAddress}");
+            HttpResponseMessage response;
+            string responseBody;
+            try {
+                response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/all;/name/", token);
+                responseBody = await response.Content.ReadAsStringAsync(token);
+                if (response.StatusCode != HttpStatusCode.MultiStatus) {
+                    Logger.Error($"Response: {response.StatusCode}");
+                    Logger.Error($"Response: {responseBody}");
+                    Logger.Error($"Failed to connect to {serverAddress}");
+                    return false;
+                }
+            } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) {
+                Logger.Error($"Failed to connect to {serverAddress}: {ex.Message}");
                 return false;
             }
 
-            List<string> outletNames = JsonSerializer.Deserialize<List<string>>(responseBody);
-            if (outletNames == null) {
-                Logger.Error($"Failed to parse outlet names from {serverAddress}");
+            List<string> outletNames;
+            try { outletNames = JsonSerializer.Deserialize<List<string>>(responseBody); } catch (JsonException ex) {
+                Logger.Error($"Failed to parse outlet names from {serverAddress}: {ex.Message}");
                 return false;
             }
             Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}");
@@ -89,6 +90,15 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             Connected = true;
 
             return Connected;
+        }
+
+        private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
+            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
+            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
+            serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
+            handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
         }
 
         public void Disconnect() {
@@ -110,5 +120,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         public void SetupDialog() {
             throw new NotImplementedException();
         }
+
+        private HttpClient httpClient = mockClient;
     }
 }
