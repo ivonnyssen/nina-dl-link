@@ -7,8 +7,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.0.0.1")]
-[assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyVersion("1.0.0.2")]
+[assembly: AssemblyFileVersion("1.0.0.2")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("DL Link")]
@@ -27,9 +27,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.2017")]
 
 // The license your plugin code is using
-[assembly: AssemblyMetadata("License", "MPL-2.0")]
+[assembly: AssemblyMetadata("License", "MIT")]
 // The url to the license
-[assembly: AssemblyMetadata("LicenseURL", "https://www.mozilla.org/en-US/MPL/2.0/")]
+[assembly: AssemblyMetadata("LicenseURL", "https://opensource.org/license/mit")]
 // The repository where your pluggin is hosted
 [assembly: AssemblyMetadata("Repository", "https://github.com/ivonnyssen/nina-dl-link")]
 
