@@ -15,7 +15,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         public async Task<bool> Poll() {
             var success = await Task.Run((async () => {
-                SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+                var handler = new HttpClientHandler() {
+                    Credentials = new NetworkCredential(userName, password)
+                };
                 var httpClient = this.httpClient ?? new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -39,7 +41,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         async Task IWritableSwitch.SetValue() {
-            SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+            var handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
             var httpClient = this.httpClient ?? new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
 
@@ -55,15 +59,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 Logger.Error($"Response: {responseBody}");
                 return;
             }
-        }
-
-        private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
-            var userName = mockUsername ?? Properties.Settings.Default.Username;
-            var password = mockPassword ?? Properties.Settings.Default.Password;
-            serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
-            handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
         }
 
         public short Id { get; private set; }
@@ -97,5 +92,8 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         private readonly HttpClient httpClient = mockClient;
+        private readonly string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
+        private readonly string userName = mockUsername ?? Properties.Settings.Default.Username;
+        private readonly string password = mockPassword ?? Properties.Settings.Default.Password;
     }
 }
