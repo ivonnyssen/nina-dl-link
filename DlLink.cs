@@ -30,6 +30,7 @@ namespace IgorVonNyssen.NINA.DlLink {
     /// </summary>
     [Export(typeof(IPluginManifest))]
     public class DlLink : PluginBase, INotifyPropertyChanged {
+        private readonly IProfileService profileService;
 
         [ImportingConstructor]
         public DlLink(IProfileService profileService, IOptionsVM options) {
@@ -38,6 +39,7 @@ namespace IgorVonNyssen.NINA.DlLink {
                 Settings.Default.UpdateSettings = false;
                 CoreUtil.SaveSettings(Settings.Default);
             }
+            this.profileService = profileService;
         }
 
         public override Task Initialize() {
@@ -57,7 +59,7 @@ namespace IgorVonNyssen.NINA.DlLink {
         public string ServerAddress {
             get => Properties.Settings.Default.ServerAddress;
             set {
-                Properties.Settings.Default.ServerAddress = value;
+                Properties.Settings.Default.ServerAddress = value.Trim();
                 CoreUtil.SaveSettings(Properties.Settings.Default);
                 RaisePropertyChanged();
             }
@@ -66,7 +68,7 @@ namespace IgorVonNyssen.NINA.DlLink {
         public string Username {
             get => Properties.Settings.Default.Username;
             set {
-                Properties.Settings.Default.Username = value;
+                Properties.Settings.Default.Username = value.Trim();
                 CoreUtil.SaveSettings(Properties.Settings.Default);
                 RaisePropertyChanged();
             }
@@ -75,7 +77,7 @@ namespace IgorVonNyssen.NINA.DlLink {
         public string Password {
             get => Properties.Settings.Default.Password;
             set {
-                Properties.Settings.Default.Password = value;
+                Properties.Settings.Default.Password = value.Trim();
                 CoreUtil.SaveSettings(Properties.Settings.Default);
                 RaisePropertyChanged();
             }
