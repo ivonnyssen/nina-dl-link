@@ -11,24 +11,39 @@ using System.Text.Json;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
-    public class DlOutlet(string name, int outletNumber, IPluginOptionsAccessor pluginSettings, HttpClient mockClient = null) : BaseINPC, IWritableSwitch {
+    public class DlOutlet(string name, int outletNumber, HttpClient mockClient = null, string mockServerAddress = null, string mockUsername = null, string mockPassword = null) : BaseINPC, IWritableSwitch {
 
         public async Task<bool> Poll() {
             var success = await Task.Run((async () => {
-                SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+                var handler = new HttpClientHandler() {
+                    Credentials = new NetworkCredential(userName, password)
+                };
                 var httpClient = this.httpClient ?? new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/");
-                var responseBody = await response.Content.ReadAsStringAsync();
-                if (response.StatusCode != HttpStatusCode.OK) {
-                    Logger.Error($"Response: {response.StatusCode}");
-                    Logger.Error($"Response: {responseBody}");
+                HttpResponseMessage response;
+                string responseBody;
+                try {
+                    response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/");
+                    responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode != HttpStatusCode.OK) {
+                        Logger.Error($"Response: {response.StatusCode}");
+                        Logger.Error($"Response: {responseBody}");
+                        return false;
+                    }
+                } catch (Exception ex) {
+                    Logger.Error($"Failed to read status of outlet {OutletNumber}: {ex.Message}");
                     return false;
                 }
 
-                bool result = JsonSerializer.Deserialize<bool>(responseBody);
+                bool result;
+                try {
+                    result = JsonSerializer.Deserialize<bool>(responseBody);
+                } catch (JsonException ex) {
+                    Logger.Error($"Failed to parse outlet state response for outlet {OutletNumber}: {ex.Message}");
+                    return false;
+                }
                 Value = result ? 1d : 0d;
                 return true;
             }));
@@ -39,7 +54,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         async Task IWritableSwitch.SetValue() {
-            SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+            var handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
             var httpClient = this.httpClient ?? new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
 
@@ -48,22 +65,20 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
             Logger.Debug($"Setting value for outlet {OutletNumber}: " + valueToSet.ToString().ToLower());
 
-            var response = await httpClient.PutAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/", content);
-            var responseBody = await response.Content.ReadAsStringAsync();
-            if (response.StatusCode != HttpStatusCode.NoContent) {
-                Logger.Error($"Response: {response.StatusCode}");
-                Logger.Error($"Response: {responseBody}");
+            HttpResponseMessage response;
+            string responseBody;
+            try {
+                response = await httpClient.PutAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/", content);
+                responseBody = await response.Content.ReadAsStringAsync();
+                if (response.StatusCode != HttpStatusCode.NoContent) {
+                    Logger.Error($"Response: {response.StatusCode}");
+                    Logger.Error($"Response: {responseBody}");
+                    return;
+                }
+            } catch (Exception ex) {
+                Logger.Error($"Failed to set status of outlet {OutletNumber}: {ex.Message}");
                 return;
             }
-        }
-
-        private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
-            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-            serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
-            handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
         }
 
         public short Id { get; private set; }
@@ -81,8 +96,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         public int OutletNumber { get; private set; } = outletNumber;
 
-        private readonly IPluginOptionsAccessor pluginSettings = pluginSettings;
-
         private double targetValue;
 
         public double Maximum => 1d;
@@ -99,5 +112,8 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         private readonly HttpClient httpClient = mockClient;
+        private readonly string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
+        private readonly string userName = mockUsername ?? Properties.Settings.Default.Username;
+        private readonly string password = mockPassword ?? Properties.Settings.Default.Password;
     }
 }

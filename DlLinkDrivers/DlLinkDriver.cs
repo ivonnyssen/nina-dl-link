@@ -20,7 +20,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
     /// The DeviceProvider will return an instance of this class as a sample weather device
     /// For this example the weather data will generate random numbers
     /// </summary>
-    public class DlLinkDriver(string deviceId, IPluginOptionsAccessor pluginSettings, HttpClient mockClient = null) : BaseINPC, ISwitchHub {
+    public class DlLinkDriver(string deviceId, HttpClient mockClient = null, string mockServerAddress = null, string mockUsername = null, string mockPassword = null) : BaseINPC, ISwitchHub {
         private readonly ICollection<ISwitch> switches = [];
 
         ICollection<ISwitch> ISwitchHub.Switches => switches;
@@ -45,14 +45,14 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         public IList<string> SupportedActions => [];
 
-        private readonly IPluginOptionsAccessor pluginSettings = pluginSettings;
-
         public string Action(string actionName, string actionParameters) {
             throw new NotImplementedException();
         }
 
         public async Task<bool> Connect(CancellationToken token) {
-            SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+            var handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
             var httpClient = this.httpClient ?? new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -68,7 +68,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                     Logger.Error($"Failed to connect to {serverAddress}");
                     return false;
                 }
-            } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) {
+            } catch (Exception ex) {
                 Logger.Error($"Failed to connect to {serverAddress}: {ex.Message}");
                 return false;
             }
@@ -83,22 +83,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             switches.Clear();
             var counter = 0;
             foreach (var outletName in outletNames) {
-                switches.Add(new DlOutlet(outletName, counter, pluginSettings));
+                switches.Add(new DlOutlet(outletName, counter));
                 counter++;
                 Logger.Debug($"Outlet name: {outletName}");
             }
             Connected = true;
 
             return Connected;
-        }
-
-        private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
-            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-            serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
-            handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
         }
 
         public void Disconnect() {
@@ -122,5 +113,8 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         private readonly HttpClient httpClient = mockClient;
+        private readonly string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
+        private readonly string userName = mockUsername ?? Properties.Settings.Default.Username;
+        private readonly string password = mockPassword ?? Properties.Settings.Default.Password;
     }
 }

@@ -29,10 +29,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         public string Name => "DlLink";
 
         public IList<ISwitchHub> GetEquipment() {
-            var pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(GetType().Assembly.GetCustomAttribute<GuidAttribute>().Value));
-            var serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
+            var serverAddress = Properties.Settings.Default.ServerAddress;
             var devices = new List<ISwitchHub> {
-                new DlLinkDriver($"{serverAddress}", pluginSettings)
+                new DlLinkDriver($"{serverAddress}")
             };
 
             return devices;
