@@ -1,15 +1,8 @@
-using Xunit;
-using Moq;
-using NINA.Profile.Interfaces;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using IgorVonNyssen.NINA.DlLink;
 using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
+using Moq;
 using Moq.Protected;
 using NINA.Equipment.Interfaces;
+using System.Net;
 
 public class DlOutletTests {
 

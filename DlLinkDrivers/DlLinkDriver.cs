@@ -2,16 +2,11 @@
 using NINA.Equipment.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net;
-using System.Text;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.Json;
-using IgorVonNyssen.NINA.DlLink.Properties;
-using NINA.Profile.Interfaces;
-using NINA.Profile;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 

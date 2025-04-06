@@ -1,18 +1,8 @@
-﻿using NINA.Core.Utility;
-using NINA.Equipment.Interfaces;
-using NINA.Equipment.Interfaces.Mediator;
+﻿using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.ViewModel;
-using NINA.Profile;
 using NINA.Profile.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
@@ -26,7 +16,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
     public class DlLinkProvider(IProfileService profileService) : IEquipmentProvider<ISwitchHub> {
         private readonly IProfileService profileService = profileService;
 
-        public string Name => "DlLink";
+        public string Name => "DL Link";
 
         public IList<ISwitchHub> GetEquipment() {
             var serverAddress = Properties.Settings.Default.ServerAddress;
