@@ -16,11 +16,6 @@ public class DlLinkDriverTests {
     [Fact]
     public async Task Connect_ShouldReturnTrue_WhenResponseIsSuccessful() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -37,7 +32,7 @@ public class DlLinkDriverTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", mockPluginSettings.Object, httpClient);
+        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlLinkDriver.Connect(CancellationToken.None);
@@ -51,11 +46,6 @@ public class DlLinkDriverTests {
     [Fact]
     public async Task Connect_ShouldReturnFalse_WhenResponseIsUnsuccessful() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -72,7 +62,7 @@ public class DlLinkDriverTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", mockPluginSettings.Object, httpClient);
+        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlLinkDriver.Connect(CancellationToken.None);
@@ -86,11 +76,6 @@ public class DlLinkDriverTests {
     [Fact]
     public async Task Connect_ShouldReturnWithoutOutlets_WhenResponseIsEmpty() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -107,7 +92,7 @@ public class DlLinkDriverTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", mockPluginSettings.Object, httpClient);
+        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlLinkDriver.Connect(CancellationToken.None);
@@ -121,11 +106,6 @@ public class DlLinkDriverTests {
     [Fact]
     public async Task Connect_ShouldReturnFalse_WhenResponseIsInvalidJson() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -142,7 +122,7 @@ public class DlLinkDriverTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", mockPluginSettings.Object, httpClient);
+        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlLinkDriver.Connect(CancellationToken.None);
@@ -156,11 +136,6 @@ public class DlLinkDriverTests {
     [Fact]
     public async Task Connect_ShouldReturnFalse_WhenServerTimesOut() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -174,7 +149,7 @@ public class DlLinkDriverTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", mockPluginSettings.Object, httpClient);
+        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlLinkDriver.Connect(CancellationToken.None);

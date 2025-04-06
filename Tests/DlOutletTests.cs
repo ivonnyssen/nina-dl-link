@@ -16,11 +16,6 @@ public class DlOutletTests {
     [Fact]
     public async Task Poll_ShouldReturnTrue_WhenResponseIsSuccessful() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -37,7 +32,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient);
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlOutlet.Poll();
@@ -50,11 +45,6 @@ public class DlOutletTests {
     [Fact]
     public async Task Poll_ShouldReturnFalse_WhenResponseIsUnsuccessful() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -71,7 +61,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient);
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlOutlet.Poll();
@@ -84,11 +74,6 @@ public class DlOutletTests {
     [Fact]
     public async Task Poll_ShouldReturnFalse_WhenHttpRequestExceptionOccurs() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -102,7 +87,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient);
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlOutlet.Poll();
@@ -115,11 +100,6 @@ public class DlOutletTests {
     [Fact]
     public async Task Poll_ShouldReturnFalse_WhenJsonExceptionOccurs() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -136,7 +116,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient);
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password");
 
         // Act
         var result = await dlOutlet.Poll();
@@ -149,11 +129,6 @@ public class DlOutletTests {
     [Fact]
     public async Task SetValue_ShouldSetCorrectValue_WhenResponseIsSuccessful() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -169,7 +144,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient) {
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password") {
             TargetValue = 1d
         };
 
@@ -192,11 +167,6 @@ public class DlOutletTests {
     [Fact]
     public async Task SetValue_ShouldLogError_WhenResponseIsUnsuccessful() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -213,7 +183,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient) {
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password") {
             TargetValue = 1d
         };
 
@@ -236,11 +206,6 @@ public class DlOutletTests {
     [Fact]
     public async Task SetValue_ShouldLogError_WhenHttpRequestExceptionOccurs() {
         // Arrange
-        var mockPluginSettings = new Mock<IPluginOptionsAccessor>();
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLUserName), string.Empty)).Returns("user");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLPassword), string.Empty)).Returns("password");
-        mockPluginSettings.Setup(p => p.GetValueString(nameof(DlLink.DLServerAddress), string.Empty)).Returns("localhost");
-
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
             .Protected()
@@ -254,7 +219,7 @@ public class DlOutletTests {
 
         var httpClient = new HttpClient(handlerMock.Object);
 
-        var dlOutlet = new DlOutlet("TestOutlet", 1, mockPluginSettings.Object, httpClient) {
+        var dlOutlet = new DlOutlet("TestOutlet", 1, httpClient, "localhost", "user", "password") {
             TargetValue = 1d
         };
 

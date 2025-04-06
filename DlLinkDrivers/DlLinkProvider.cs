@@ -23,16 +23,14 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
     /// </summary>
     [Export(typeof(IEquipmentProvider))]
     [method: ImportingConstructor]
-    public class DlLinkProvider(IProfileService profileService) : IEquipmentProvider<ISwitchHub> {
-        private readonly IProfileService profileService = profileService;
-
+    public class DlLinkProvider(string mockServerAddress = null) : IEquipmentProvider<ISwitchHub> {
         public string Name => "DlLink";
 
         public IList<ISwitchHub> GetEquipment() {
-            var pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(GetType().Assembly.GetCustomAttribute<GuidAttribute>().Value));
-            var serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
+            string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
+            Logger.Debug($"GetEquipment: {serverAddress}");
             var devices = new List<ISwitchHub> {
-                new DlLinkDriver($"{serverAddress}", pluginSettings)
+                new DlLinkDriver($"{serverAddress}")
             };
 
             return devices;

@@ -30,8 +30,6 @@ namespace IgorVonNyssen.NINA.DlLink {
     /// </summary>
     [Export(typeof(IPluginManifest))]
     public class DlLink : PluginBase, INotifyPropertyChanged {
-        private readonly IPluginOptionsAccessor pluginSettings;
-        private readonly IProfileService profileService;
 
         [ImportingConstructor]
         public DlLink(IProfileService profileService, IOptionsVM options) {
@@ -40,54 +38,45 @@ namespace IgorVonNyssen.NINA.DlLink {
                 Settings.Default.UpdateSettings = false;
                 CoreUtil.SaveSettings(Settings.Default);
             }
+        }
 
-            // This helper class can be used to store plugin settings that are dependent on the current profile
-            this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(this.Identifier));
-            this.profileService = profileService;
-            // React on a changed profile
-            profileService.ProfileChanged += ProfileService_ProfileChanged;
+        public override Task Initialize() {
+            Logger.Debug("Initializing DL Link Plugin");
+            return base.Initialize();
         }
 
         public override Task Teardown() {
             // Make sure to unregister an event when the object is no longer in use. Otherwise garbage collection will be prevented.
-            profileService.ProfileChanged -= ProfileService_ProfileChanged;
-
             return base.Teardown();
         }
 
         private void ProfileService_ProfileChanged(object sender, EventArgs e) {
             // Raise the event that this profile specific value has been changed due to the profile switch
-            RaisePropertyChanged(nameof(DLServerAddress));
-            RaisePropertyChanged(nameof(DLUserName));
-            RaisePropertyChanged(nameof(DLPassword));
         }
 
-        public string DLServerAddress {
-            get {
-                return pluginSettings.GetValueString(nameof(DLServerAddress), string.Empty);
-            }
+        public string ServerAddress {
+            get => Properties.Settings.Default.ServerAddress;
             set {
-                pluginSettings.SetValueString(nameof(DLServerAddress), value);
+                Properties.Settings.Default.ServerAddress = value;
+                CoreUtil.SaveSettings(Properties.Settings.Default);
                 RaisePropertyChanged();
             }
         }
 
-        public string DLUserName {
-            get {
-                return pluginSettings.GetValueString(nameof(DLUserName), string.Empty);
-            }
+        public string Username {
+            get => Properties.Settings.Default.Username;
             set {
-                pluginSettings.SetValueString(nameof(DLUserName), value);
+                Properties.Settings.Default.Username = value;
+                CoreUtil.SaveSettings(Properties.Settings.Default);
                 RaisePropertyChanged();
             }
         }
 
-        public string DLPassword {
-            get {
-                return pluginSettings.GetValueString(nameof(DLPassword), string.Empty);
-            }
+        public string Password {
+            get => Properties.Settings.Default.Password;
             set {
-                pluginSettings.SetValueString(nameof(DLPassword), value);
+                Properties.Settings.Default.Password = value;
+                CoreUtil.SaveSettings(Properties.Settings.Default);
                 RaisePropertyChanged();
             }
         }

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
+
     /// <summary>
     /// This Class shows the basic principle on how to add a new Sequence Instruction to the N.I.N.A. sequencer via the plugin interface
     /// For ease of use this class inherits the abstract SequenceItem which already handles most of the running logic, like logging, exception handling etc.
@@ -31,6 +32,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
     [Export(typeof(ISequenceItem))]
     [JsonObject(MemberSerialization.OptIn)]
     public class DlLinkInstruction : SequenceItem {
+
         /// <summary>
         /// The constructor marked with [ImportingConstructor] will be used to import and construct the object
         /// General device interfaces can be added to the constructor parameters and will be automatically injected on instantiation by the plugin loader
@@ -63,8 +65,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
         /// </remarks>
         [ImportingConstructor]
         public DlLinkInstruction() {
-            Text = Settings.Default.DefaultNotificationMessage;
+            Text = Settings.Default.ServerAddress;
         }
+
         public DlLinkInstruction(DlLinkInstruction copyMe) : this() {
             CopyMetaData(copyMe);
         }

@@ -11,11 +11,13 @@ using System.Text.Json;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
-    public class DlOutlet(string name, int outletNumber, IPluginOptionsAccessor pluginSettings, HttpClient mockClient = null) : BaseINPC, IWritableSwitch {
+    public class DlOutlet(string name, int outletNumber, HttpClient mockClient = null, string mockServerAddress = null, string mockUserName = null, string mockPassword = null) : BaseINPC, IWritableSwitch {
 
         public async Task<bool> Poll() {
             var success = await Task.Run((async () => {
-                SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+                var handler = new HttpClientHandler() {
+                    Credentials = new NetworkCredential(userName, password)
+                };
                 var httpClient = this.httpClient ?? new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -30,7 +32,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                         Logger.Error($"Response: {responseBody}");
                         return false;
                     }
-                } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) {
+                } catch (Exception ex) {
                     Logger.Error($"Failed to read status of outlet {OutletNumber}: {ex.Message}");
                     return false;
                 }
@@ -52,7 +54,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         async Task IWritableSwitch.SetValue() {
-            SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler);
+            var handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
             var httpClient = this.httpClient ?? new HttpClient(handler);
             httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
 
@@ -71,19 +75,10 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                     Logger.Error($"Response: {responseBody}");
                     return;
                 }
-            } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) {
+            } catch (Exception ex) {
                 Logger.Error($"Failed to set status of outlet {OutletNumber}: {ex.Message}");
                 return;
             }
-        }
-
-        private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
-            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-            serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
-            handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
         }
 
         public short Id { get; private set; }
@@ -101,8 +96,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         public int OutletNumber { get; private set; } = outletNumber;
 
-        private readonly IPluginOptionsAccessor pluginSettings = pluginSettings;
-
         private double targetValue;
 
         public double Maximum => 1d;
@@ -119,5 +112,8 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         private readonly HttpClient httpClient = mockClient;
+        private readonly string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
+        private readonly string userName = mockUserName ?? Properties.Settings.Default.Username;
+        private readonly string password = mockPassword ?? Properties.Settings.Default.Password;
     }
 }
