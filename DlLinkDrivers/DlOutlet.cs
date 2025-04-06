@@ -22,15 +22,28 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/");
-                var responseBody = await response.Content.ReadAsStringAsync();
-                if (response.StatusCode != HttpStatusCode.OK) {
-                    Logger.Error($"Response: {response.StatusCode}");
-                    Logger.Error($"Response: {responseBody}");
+                HttpResponseMessage response;
+                string responseBody;
+                try {
+                    response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/");
+                    responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode != HttpStatusCode.OK) {
+                        Logger.Error($"Response: {response.StatusCode}");
+                        Logger.Error($"Response: {responseBody}");
+                        return false;
+                    }
+                } catch (Exception ex) {
+                    Logger.Error($"Failed to read status of outlet {OutletNumber}: {ex.Message}");
                     return false;
                 }
 
-                bool result = JsonSerializer.Deserialize<bool>(responseBody);
+                bool result;
+                try {
+                    result = JsonSerializer.Deserialize<bool>(responseBody);
+                } catch (JsonException ex) {
+                    Logger.Error($"Failed to parse outlet state response for outlet {OutletNumber}: {ex.Message}");
+                    return false;
+                }
                 Value = result ? 1d : 0d;
                 return true;
             }));
@@ -52,11 +65,18 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
             Logger.Debug($"Setting value for outlet {OutletNumber}: " + valueToSet.ToString().ToLower());
 
-            var response = await httpClient.PutAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/", content);
-            var responseBody = await response.Content.ReadAsStringAsync();
-            if (response.StatusCode != HttpStatusCode.NoContent) {
-                Logger.Error($"Response: {response.StatusCode}");
-                Logger.Error($"Response: {responseBody}");
+            HttpResponseMessage response;
+            string responseBody;
+            try {
+                response = await httpClient.PutAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/", content);
+                responseBody = await response.Content.ReadAsStringAsync();
+                if (response.StatusCode != HttpStatusCode.NoContent) {
+                    Logger.Error($"Response: {response.StatusCode}");
+                    Logger.Error($"Response: {responseBody}");
+                    return;
+                }
+            } catch (Exception ex) {
+                Logger.Error($"Failed to set status of outlet {OutletNumber}: {ex.Message}");
                 return;
             }
         }
