@@ -63,7 +63,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
         /// </remarks>
         [ImportingConstructor]
         public DlLinkInstruction() {
-            Text = Settings.Default.DefaultNotificationMessage;
+            Text = Settings.Default.ServerAddress;
         }
         public DlLinkInstruction(DlLinkInstruction copyMe) : this() {
             CopyMetaData(copyMe);
