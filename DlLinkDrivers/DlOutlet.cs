@@ -19,37 +19,18 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                     Credentials = new NetworkCredential(userName, password)
                 };
                 var httpClient = this.httpClient ?? new HttpClient(handler);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                switch (await HttpUtils.GetOutletState(httpClient, serverAddress, OutletNumber, default)) {
+                    case { IsOk: true, Value: var result }:
+                        Value = result ? 1d : 0d;
+                        break;
 
-                HttpResponseMessage response;
-                string responseBody;
-                try {
-                    response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/");
-                    responseBody = await response.Content.ReadAsStringAsync();
-                    if (response.StatusCode != HttpStatusCode.OK) {
-                        Logger.Error($"Response: {response.StatusCode}");
-                        Logger.Error($"Response: {responseBody}");
+                    default:
                         return false;
-                    }
-                } catch (Exception ex) {
-                    Logger.Error($"Failed to read status of outlet {OutletNumber}: {ex.Message}");
-                    return false;
                 }
-
-                bool result;
-                try {
-                    result = JsonSerializer.Deserialize<bool>(responseBody);
-                } catch (JsonException ex) {
-                    Logger.Error($"Failed to parse outlet state response for outlet {OutletNumber}: {ex.Message}");
-                    return false;
-                }
-                Value = result ? 1d : 0d;
                 return true;
             }));
             if (success) RaisePropertyChanged(nameof(Value));
 
-            // Implement the Poll method
             return success;
         }
 
@@ -58,26 +39,14 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 Credentials = new NetworkCredential(userName, password)
             };
             var httpClient = this.httpClient ?? new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
-
             bool valueToSet = Math.Abs(this.TargetValue - 1d) < Double.Epsilon;
-            var content = new StringContent($"value={valueToSet.ToString().ToLower()}", System.Text.Encoding.ASCII, "application/x-www-form-urlencoded");
+            switch (await HttpUtils.SetOutletState(httpClient, serverAddress, OutletNumber, valueToSet, default)) {
+                case { IsOk: true }:
+                    Logger.Debug($"Set value for outlet {OutletNumber}: " + valueToSet.ToString().ToLower());
+                    break;
 
-            Logger.Debug($"Setting value for outlet {OutletNumber}: " + valueToSet.ToString().ToLower());
-
-            HttpResponseMessage response;
-            string responseBody;
-            try {
-                response = await httpClient.PutAsync($"http://{serverAddress}/restapi/relay/outlets/{OutletNumber}/state/", content);
-                responseBody = await response.Content.ReadAsStringAsync();
-                if (response.StatusCode != HttpStatusCode.NoContent) {
-                    Logger.Error($"Response: {response.StatusCode}");
-                    Logger.Error($"Response: {responseBody}");
-                    return;
-                }
-            } catch (Exception ex) {
-                Logger.Error($"Failed to set status of outlet {OutletNumber}: {ex.Message}");
-                return;
+                default:
+                    break;
             }
         }
 

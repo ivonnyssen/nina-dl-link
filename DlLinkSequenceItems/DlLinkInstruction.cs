@@ -12,7 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
+namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
+
     /// <summary>
     /// This Class shows the basic principle on how to add a new Sequence Instruction to the N.I.N.A. sequencer via the plugin interface
     /// For ease of use this class inherits the abstract SequenceItem which already handles most of the running logic, like logging, exception handling etc.
@@ -31,6 +32,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
     [Export(typeof(ISequenceItem))]
     [JsonObject(MemberSerialization.OptIn)]
     public class DlLinkInstruction : SequenceItem {
+
         /// <summary>
         /// The constructor marked with [ImportingConstructor] will be used to import and construct the object
         /// General device interfaces can be added to the constructor parameters and will be automatically injected on instantiation by the plugin loader
@@ -63,8 +65,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
         /// </remarks>
         [ImportingConstructor]
         public DlLinkInstruction() {
-            Text = Settings.Default.ServerAddress;
+            OutletNumber = Settings.Default.ServerAddress;
         }
+
         public DlLinkInstruction(DlLinkInstruction copyMe) : this() {
             CopyMetaData(copyMe);
         }
@@ -76,7 +79,16 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
         /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
         /// </remarks>
         [JsonProperty]
-        public string Text { get; set; }
+        public string OutletNumber { get; set; }
+
+        /// <summary>
+        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// </summary>
+        /// <remarks>
+        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
+        /// </remarks>
+        [JsonProperty]
+        public OutletActions Action { get; set; }
 
         /// <summary>
         /// The core logic when the sequence item is running resides here
@@ -86,7 +98,12 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
         /// <param name="token">When a cancel signal is triggered from outside, this token can be used to register to it or check if it is cancelled</param>
         /// <returns></returns>
         public override Task Execute(IProgress<ApplicationStatus> progress, CancellationToken token) {
-            Notification.ShowSuccess(Text);
+            //get the current state of the outlet
+
+            //check if the outlet is already in the desired state
+
+            //if not, set the outlet to the desired state
+
             // Add logic to run the item here
             return Task.CompletedTask;
         }
@@ -104,7 +121,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(DlLinkInstruction)}, Text: {Text}";
+            return $"Category: {Category}, Item: {nameof(DlLinkInstruction)}, Text: {OutletNumber}";
         }
     }
 }

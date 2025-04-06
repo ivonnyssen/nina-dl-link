@@ -45,7 +45,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         public async Task<bool> Connect(CancellationToken token) {
-            var handler = new HttpClientHandler() {
+            /* var handler = new HttpClientHandler() {
                 Credentials = new NetworkCredential(userName, password)
             };
             var httpClient = this.httpClient ?? new HttpClient(handler);
@@ -73,16 +73,30 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 Logger.Error($"Failed to parse outlet names from {serverAddress}: {ex.Message}");
                 return false;
             }
-            Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}");
+            Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}"); */
 
-            switches.Clear();
-            var counter = 0;
-            foreach (var outletName in outletNames) {
-                switches.Add(new DlOutlet(outletName, counter));
-                counter++;
-                Logger.Debug($"Outlet name: {outletName}");
+            var handler = new HttpClientHandler() {
+                Credentials = new NetworkCredential(userName, password)
+            };
+            var httpClient = this.httpClient ?? new HttpClient(handler);
+            switch (await HttpUtils.GetOutletNames(httpClient, serverAddress, token)) {
+                case { IsOk: true, Value: var outletNames }:
+                    switches.Clear();
+                    var counter = 0;
+                    foreach (var outletName in outletNames) {
+                        switches.Add(new DlOutlet(outletName, counter));
+                        counter++;
+                        Logger.Debug($"Outlet name: {outletName}");
+                    }
+                    Connected = true;
+                    Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}");
+                    break;
+
+                default:
+                    Logger.Error($"Failed to connect to {serverAddress}");
+                    Connected = false;
+                    break;
             }
-            Connected = true;
 
             return Connected;
         }

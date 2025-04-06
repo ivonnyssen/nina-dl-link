@@ -8,7 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
+namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
+
     /// <summary>
     /// This Class shows the basic principle on how to add a new Sequence Trigger to the N.I.N.A. sequencer via the plugin interface
     /// For ease of use this class inherits the abstract SequenceTrigger which already handles most of the running logic, like logging, exception handling etc.
@@ -27,6 +28,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
     [Export(typeof(ISequenceCondition))]
     [JsonObject(MemberSerialization.OptIn)]
     public class DlLinkCondition : SequenceCondition {
+
         /// <summary>
         /// The constructor marked with [ImportingConstructor] will be used to import and construct the object
         /// General device interfaces can be added to the constructor parameters and will be automatically injected on instantiation by the plugin loader
