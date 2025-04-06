@@ -20,7 +20,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
     /// The DeviceProvider will return an instance of this class as a sample weather device
     /// For this example the weather data will generate random numbers
     /// </summary>
-    public class DlLinkDriver(string deviceId, IPluginOptionsAccessor pluginSettings, HttpClient mockClient = null) : BaseINPC, ISwitchHub {
+    public class DlLinkDriver(string deviceId, HttpClient mockClient = null, string mockServerAddress = null) : BaseINPC, ISwitchHub {
         private readonly ICollection<ISwitch> switches = [];
 
         ICollection<ISwitch> ISwitchHub.Switches => switches;
@@ -44,8 +44,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         public string DriverVersion { get; private set; }
 
         public IList<string> SupportedActions => [];
-
-        private readonly IPluginOptionsAccessor pluginSettings = pluginSettings;
 
         public string Action(string actionName, string actionParameters) {
             throw new NotImplementedException();
@@ -83,7 +81,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             switches.Clear();
             var counter = 0;
             foreach (var outletName in outletNames) {
-                switches.Add(new DlOutlet(outletName, counter, pluginSettings));
+                switches.Add(new DlOutlet(outletName, counter));
                 counter++;
                 Logger.Debug($"Outlet name: {outletName}");
             }
@@ -93,9 +91,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
-            var userName = pluginSettings.GetValueString(nameof(DlLink.DLUserName), string.Empty);
-            var password = pluginSettings.GetValueString(nameof(DlLink.DLPassword), string.Empty);
-            serverAddress = pluginSettings.GetValueString(nameof(DlLink.DLServerAddress), string.Empty);
+            var userName = Properties.Settings.Default.Username;
+            var password = Properties.Settings.Default.Password;
+            serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
             handler = new HttpClientHandler() {
                 Credentials = new NetworkCredential(userName, password)
             };

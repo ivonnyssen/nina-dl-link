@@ -44,7 +44,7 @@ namespace IgorVonNyssen.NINA.DlLink {
             return base.Teardown();
         }
 
-        public string DLServerAddress {
+        public string ServerAddress {
             get => Settings.Default.ServerAddress;
             set {
                 Settings.Default.ServerAddress = value.Trim();
@@ -53,7 +53,7 @@ namespace IgorVonNyssen.NINA.DlLink {
             }
         }
 
-        public string DLUserName {
+        public string Username {
             get => Settings.Default.Username;
             set {
                 Settings.Default.Username = value.Trim();
@@ -62,7 +62,7 @@ namespace IgorVonNyssen.NINA.DlLink {
             }
         }
 
-        public string DLPassword {
+        public string Password {
             get => Settings.Default.Password;
             set {
                 Settings.Default.Password = value.Trim();

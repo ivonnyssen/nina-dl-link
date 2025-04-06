@@ -10,16 +10,16 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel Margin="0,20,0,20" Orientation="Horizontal">
                     <TextBlock Text="Digital Logger Switch IP Address" />
-                    <TextBox MinWidth="50" Text="{Binding DLServerAddress}" />
+                    <TextBox MinWidth="50" Text="{Binding ServerAddress}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Username" />
-                <TextBox MinWidth="50" Text="{Binding DLUserName}" />
+                <TextBox MinWidth="50" Text="{Binding Username}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Password" />
-                <TextBox MinWidth="50" Text="{Binding DLPassword}" />
+                <TextBox MinWidth="50" Text="{Binding Password}" />
             </StackPanel>
         </StackPanel>
     </DataTemplate>
