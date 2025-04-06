@@ -11,7 +11,7 @@ using System.Text.Json;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
-    public class DlOutlet(string name, int outletNumber, HttpClient mockClient = null) : BaseINPC, IWritableSwitch {
+    public class DlOutlet(string name, int outletNumber, HttpClient mockClient = null, string mockServerAddress = null, string mockUsername = null, string mockPassword = null) : BaseINPC, IWritableSwitch {
 
         public async Task<bool> Poll() {
             var success = await Task.Run((async () => {
@@ -58,9 +58,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         private void SetupHttpClientHandler(out string serverAddress, out HttpClientHandler handler) {
-            var userName = Properties.Settings.Default.Username;
-            var password = Properties.Settings.Default.Password;
-            serverAddress = Properties.Settings.Default.ServerAddress;
+            var userName = mockUsername ?? Properties.Settings.Default.Username;
+            var password = mockPassword ?? Properties.Settings.Default.Password;
+            serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
             handler = new HttpClientHandler() {
                 Credentials = new NetworkCredential(userName, password)
             };
