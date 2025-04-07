@@ -27,7 +27,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
     /// </summary>
     [ExportMetadata("Name", "Plugin Template Trigger")]
     [ExportMetadata("Description", "This trigger will show a notification when a random generated number is even on evaluation")]
-    [ExportMetadata("Icon", "Plugin_Test_SVG")]
+    [ExportMetadata("Icon", "DL_Link_SVG")]
     [ExportMetadata("Category", "DL Link")]
     [Export(typeof(ISequenceTrigger))]
     [JsonObject(MemberSerialization.OptIn)]

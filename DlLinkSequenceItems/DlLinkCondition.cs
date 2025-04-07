@@ -23,7 +23,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
     /// </summary>
     [ExportMetadata("Name", "Plugin Template Condition")]
     [ExportMetadata("Description", "This condition is true until a user flicks a combobox on the condition")]
-    [ExportMetadata("Icon", "Plugin_Test_SVG")]
+    [ExportMetadata("Icon", "DL_Link_SVG")]
     [ExportMetadata("Category", "DL Link")]
     [Export(typeof(ISequenceCondition))]
     [JsonObject(MemberSerialization.OptIn)]

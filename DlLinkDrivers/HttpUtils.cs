@@ -111,5 +111,38 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             }
             return Result<bool>.Ok(true);
         }
+
+        public static async Task<Result<bool>> TriggerOutletAction(HttpClient httpClient, string serverAddress, int outletNumber, OutletActions action, CancellationToken token) {
+            switch (action) {
+                case OutletActions.On:
+                    return await SetOutletState(httpClient, serverAddress, outletNumber, true, token);
+
+                case OutletActions.Off:
+                    return await SetOutletState(httpClient, serverAddress, outletNumber, false, token);
+
+                case OutletActions.Cycle:
+                    httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
+                    Logger.Debug($"Cycling outlet {outletNumber}: ");
+                    HttpResponseMessage response;
+                    string responseBody;
+                    try {
+                        response = await httpClient.PostAsync($"http://{serverAddress}/restapi/relay/outlets/{outletNumber}/cycle/", default, token);
+                        responseBody = await response.Content.ReadAsStringAsync(token);
+                        if (response.StatusCode != HttpStatusCode.NoContent) {
+                            Logger.Error($"Response: {response.StatusCode}");
+                            Logger.Error($"Response: {responseBody}");
+                            return Result<bool>.Err();
+                        }
+                    } catch (Exception ex) {
+                        Logger.Error($"Failed to set status of outlet {outletNumber}: {ex.Message}");
+                        return Result<bool>.Err();
+                    }
+                    return Result<bool>.Ok(true);
+
+                default:
+                    Logger.Error($"Invalid action: {action}");
+                    return Result<bool>.Err();
+            }
+        }
     }
 }
