@@ -32,16 +32,16 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
     /// <remarks>
     /// Available interfaces to be injected:
     /// </remarks>
-    [ExportMetadata("Name", "DL Link Action")]
-    [ExportMetadata("Description", "Turn an outlet on, off, or cycle it. THen you can optionally wait and refresh a specified list of devices.")]
+    [ExportMetadata("Name", "DL Link Rescan")]
+    [ExportMetadata("Description", "Refreshes the list of devices for a given category. Use it to find a device after you turned on a switch.")]
     [ExportMetadata("Icon", "DL_Link_SVG")]
     [ExportMetadata("Category", "DL Link")]
     [Export(typeof(ISequenceItem))]
     [JsonObject(MemberSerialization.OptIn)]
-    public class DlLinkInstruction : SequenceItem {
+    public class DlLinkRescan : SequenceItem {
 
         [ImportingConstructor]
-        public DlLinkInstruction(ICameraMediator cameraMediator,
+        public DlLinkRescan(ICameraMediator cameraMediator,
             IFocuserMediator focuserMediator,
             IFilterWheelMediator filterWheelMediator,
             ITelescopeMediator telescopeMediator,
@@ -66,7 +66,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
             weatherDataMediator,
             safetyMonitorMediator) { }
 
-        private DlLinkInstruction(DlLinkInstruction copyMe,
+        private DlLinkRescan(DlLinkRescan copyMe,
             ICameraMediator cameraMediator,
             IFocuserMediator focuserMediator,
             IFilterWheelMediator filterWheelMediator,
@@ -99,25 +99,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
         /// </remarks>
         [JsonProperty]
-        public int OutletNumber { get; set; }
-
-        /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
-        /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
-        [JsonProperty]
-        public OutletActions Action { get; set; }
-
-        /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
-        /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
-        [JsonProperty]
-        public int Delay { get; set; } = 2;
+        public int Delay { get; set; } = 0;
 
         /// <summary>
         /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
@@ -136,35 +118,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// <param name="token">When a cancel signal is triggered from outside, this token can be used to register to it or check if it is cancelled</param>
         /// <returns></returns>
         public override async Task Execute(IProgress<ApplicationStatus> progress, CancellationToken token) {
-            if (OutletNumber < 0) {
-                Logger.Error($"Outlet number {OutletNumber} is invalid");
-                return;
-            }
-
-            //get the current state of the outlet
-            var handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(UserName, Password)
-            };
-            var httpClient = this.HttpClient ?? new HttpClient(handler);
-            var result = await HttpUtils.GetOutletState(httpClient, ServerAddress, OutletNumber, token);
-            if (result.IsErr) {
-                Logger.Error($"Failed to get outlet state for {OutletNumber}");
-                return;
-            }
-
-            //check if the outlet is already in the desired state
-            if (result.Value == (Action == OutletActions.On)) {
-                Logger.Debug($"Outlet {OutletNumber} is already in the desired state");
-                return;
-            }
-
-            //if not, trigger the desired outlet action
-            result = await HttpUtils.TriggerOutletAction(httpClient, ServerAddress, OutletNumber, Action, token);
-            if (result.IsOk) {
-                Logger.Debug($"Triggered outlet {OutletNumber} to {Action}");
-            } else {
-                Logger.Error($"Failed to trigger outlet {OutletNumber} to {Action}");
-            }
             //wait for the delay time
             await Task.Delay(Math.Abs(Delay) * 1000, token);
             //trigger a Rescan if requested
@@ -225,7 +178,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override object Clone() {
-            return new DlLinkInstruction(this, cameraMediator, focuserMediator, filterWheelMediator, telescopeMediator, guiderMediator, rotatorMediator, domeMediator, switchMediator, flatDeviceMediator, weatherDataMediator, safetyMonitorMediator);
+            return new DlLinkRescan(this, cameraMediator, focuserMediator, filterWheelMediator, telescopeMediator, guiderMediator, rotatorMediator, domeMediator, switchMediator, flatDeviceMediator, weatherDataMediator, safetyMonitorMediator);
         }
 
         /// <summary>
@@ -233,7 +186,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(DlLinkInstruction)}, Text: {OutletNumber}";
+            return $"Category: {Category}, Item: {nameof(DlLinkRescan)}, Device class: {Rescan}";
         }
 
         private readonly ICameraMediator cameraMediator;

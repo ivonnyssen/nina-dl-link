@@ -5,6 +5,8 @@
     xmlns:local="clr-namespace:IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems"
     xmlns:mini="clr-namespace:NINA.View.Sequencer.MiniSequencer;assembly=NINA.Sequencer"
     xmlns:nina="clr-namespace:NINA.View.Sequencer;assembly=NINA.Sequencer"
+    xmlns:ninactrl="clr-namespace:NINA.CustomControlLibrary;assembly=NINA.CustomControlLibrary"
+    xmlns:rules="clr-namespace:NINA.Core.Utility.ValidationRules;assembly=NINA.Core"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!--  Define ObjectDataProvider for OutletActions enum  -->
@@ -14,6 +16,15 @@
         ObjectType="{x:Type sys:Enum}">
         <ObjectDataProvider.MethodParameters>
             <x:Type TypeName="local:OutletActions" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+
+    <ObjectDataProvider
+        x:Key="MediatorsProvider"
+        MethodName="GetValues"
+        ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="local:Mediators" />
         </ObjectDataProvider.MethodParameters>
     </ObjectDataProvider>
 
@@ -29,22 +40,55 @@
     <DataTemplate DataType="{x:Type local:DlLinkInstruction}">
         <nina:SequenceBlockView>
             <nina:SequenceBlockView.SequenceItemContent>
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="Outlet Number" />
                         <TextBox
                             MinWidth="40"
                             Margin="5,0,0,0"
-                            Text="{Binding OutletNumber}"
-                            TextAlignment="Right" />
+                            TextAlignment="Right">
+                            <TextBox.Text>
+                                <Binding Mode="TwoWay" Path="OutletNumber">
+                                    <Binding.ValidationRules>
+                                        <rules:GreaterZeroRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock VerticalAlignment="Center" Text="Action" />
+                        <TextBlock VerticalAlignment="Center" Text="  |  Action" />
                         <ComboBox
                             MinWidth="40"
                             Margin="5,0,0,0"
                             ItemsSource="{Binding Source={StaticResource OutletActionsProvider}}"
                             SelectedItem="{Binding Action}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Delay" />
+                        <ninactrl:UnitTextBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            TextAlignment="Right"
+                            Unit="s">
+                            <ninactrl:UnitTextBox.Text>
+                                <Binding Mode="TwoWay" Path="Delay">
+                                    <Binding.ValidationRules>
+                                        <rules:GreaterZeroRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ninactrl:UnitTextBox.Text>
+                        </ninactrl:UnitTextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Device to Refresh" />
+                        <ComboBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            ItemsSource="{Binding Source={StaticResource MediatorsProvider}}"
+                            SelectedItem="{Binding Rescan}" />
                     </StackPanel>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
@@ -56,22 +100,55 @@
     <DataTemplate x:Key="IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems.DlLinkInstruction_Mini">
         <mini:MiniSequenceItem>
             <mini:MiniSequenceItem.SequenceItemContent>
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="Outlet Number" />
                         <TextBox
                             MinWidth="40"
                             Margin="5,0,0,0"
-                            Text="{Binding OutletNumber}"
-                            TextAlignment="Right" />
+                            TextAlignment="Right">
+                            <TextBox.Text>
+                                <Binding Mode="TwoWay" Path="OutletNumber">
+                                    <Binding.ValidationRules>
+                                        <rules:GreaterZeroRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock VerticalAlignment="Center" Text="Action" />
+                        <TextBlock VerticalAlignment="Center" Text="  |  Action" />
                         <ComboBox
                             MinWidth="40"
                             Margin="5,0,0,0"
                             ItemsSource="{Binding Source={StaticResource OutletActionsProvider}}"
                             SelectedItem="{Binding Action}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Delay" />
+                        <ninactrl:UnitTextBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            TextAlignment="Right"
+                            Unit="s">
+                            <ninactrl:UnitTextBox.Text>
+                                <Binding Mode="TwoWay" Path="Delay">
+                                    <Binding.ValidationRules>
+                                        <rules:GreaterZeroRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ninactrl:UnitTextBox.Text>
+                        </ninactrl:UnitTextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Device to Refresh" />
+                        <ComboBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            ItemsSource="{Binding Source={StaticResource MediatorsProvider}}"
+                            SelectedItem="{Binding Rescan}" />
                     </StackPanel>
                 </StackPanel>
             </mini:MiniSequenceItem.SequenceItemContent>
@@ -83,7 +160,7 @@
     <DataTemplate DataType="{x:Type local:DlLinkCondition}">
         <nina:SequenceBlockView>
             <nina:SequenceBlockView.SequenceItemContent>
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="Outlet Number" />
                         <TextBox
@@ -110,7 +187,7 @@
     <DataTemplate x:Key="IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems.DlLinkCondition_Mini">
         <mini:MiniSequenceItem>
             <mini:MiniSequenceItem.SequenceItemContent>
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="Outlet Number" />
                         <TextBox
@@ -124,6 +201,78 @@
                             MinWidth="40"
                             Text="{Binding State}"
                             TextAlignment="Right" />
+                    </StackPanel>
+                </StackPanel>
+            </mini:MiniSequenceItem.SequenceItemContent>
+        </mini:MiniSequenceItem>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:DlLinkRescan}">
+        <nina:SequenceBlockView>
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Delay" />
+                        <ninactrl:UnitTextBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            TextAlignment="Right"
+                            Unit="s">
+                            <ninactrl:UnitTextBox.Text>
+                                <Binding Mode="TwoWay" Path="Delay">
+                                    <Binding.ValidationRules>
+                                        <rules:GreaterZeroRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ninactrl:UnitTextBox.Text>
+                        </ninactrl:UnitTextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Device to Refresh" />
+                        <ComboBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            ItemsSource="{Binding Source={StaticResource MediatorsProvider}}"
+                            SelectedItem="{Binding Rescan}" />
+                    </StackPanel>
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+
+    <!--  The definition of the test instruction plugin style in the mini format on the imaging tab  -->
+    <!--  The Key has to be defined as the fully qualified instruction name and the "_Mini" postfix  -->
+    <DataTemplate x:Key="IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems.DlLinkRescan_Mini">
+        <mini:MiniSequenceItem>
+            <mini:MiniSequenceItem.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Delay" />
+                        <ninactrl:UnitTextBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            TextAlignment="Right"
+                            Unit="s">
+                            <ninactrl:UnitTextBox.Text>
+                                <Binding Mode="TwoWay" Path="Delay">
+                                    <Binding.ValidationRules>
+                                        <rules:GreaterZeroRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </ninactrl:UnitTextBox.Text>
+                        </ninactrl:UnitTextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Text="  |  Device to Refresh" />
+                        <ComboBox
+                            MinWidth="40"
+                            Margin="5,0,0,0"
+                            ItemsSource="{Binding Source={StaticResource MediatorsProvider}}"
+                            SelectedItem="{Binding Rescan}" />
                     </StackPanel>
                 </StackPanel>
             </mini:MiniSequenceItem.SequenceItemContent>

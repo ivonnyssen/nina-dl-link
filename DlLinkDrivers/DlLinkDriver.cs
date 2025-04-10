@@ -45,36 +45,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         public async Task<bool> Connect(CancellationToken token) {
-            /* var handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(userName, password)
-            };
-            var httpClient = this.httpClient ?? new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpResponseMessage response;
-            string responseBody;
-            try {
-                response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/all;/name/", token);
-                responseBody = await response.Content.ReadAsStringAsync(token);
-                if (response.StatusCode != HttpStatusCode.MultiStatus) {
-                    Logger.Error($"Response: {response.StatusCode}");
-                    Logger.Error($"Response: {responseBody}");
-                    Logger.Error($"Failed to connect to {serverAddress}");
-                    return false;
-                }
-            } catch (Exception ex) {
-                Logger.Error($"Failed to connect to {serverAddress}: {ex.Message}");
-                return false;
-            }
-
-            List<string> outletNames;
-            try { outletNames = JsonSerializer.Deserialize<List<string>>(responseBody); } catch (JsonException ex) {
-                Logger.Error($"Failed to parse outlet names from {serverAddress}: {ex.Message}");
-                return false;
-            }
-            Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}"); */
-
             var handler = new HttpClientHandler() {
                 Credentials = new NetworkCredential(userName, password)
             };
