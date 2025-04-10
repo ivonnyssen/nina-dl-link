@@ -15,24 +15,9 @@ using System.Windows;
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
     /// <summary>
-    /// This Class shows the basic principle on how to add a new Sequence Instruction to the N.I.N.A. sequencer via the plugin interface
-    /// For ease of use this class inherits the abstract SequenceItem which already handles most of the running logic, like logging, exception handling etc.
-    /// A complete custom implementation by just implementing ISequenceItem is possible too
-    /// The following MetaData can be set to drive the initial values
-    /// --> Name - The name that will be displayed for the item
-    /// --> Description - a brief summary of what the item is doing. It will be displayed as a tooltip on mouseover in the application
-    /// --> Icon - a string to the key value of a Geometry inside N.I.N.A.'s geometry resources
-    ///
-    /// If the item has some preconditions that should be validated, it shall also extend the IValidatable interface and add the validation logic accordingly.
+    /// Refreshes the list of devices for a given category. Use it to find a device after you turned on a switch.
     /// </summary>
-    /// <remarks>
-    /// The constructor marked with [ImportingConstructor] will be used to import and construct the object
-    /// General device interfaces can be added to the constructor parameters and will be automatically injected on instantiation by the plugin loader
-    /// </remarks>
-    /// <remarks>
-    /// Available interfaces to be injected:
-    /// </remarks>
-    [ExportMetadata("Name", "DL Link Rescan")]
+    [ExportMetadata("Name", "DL Link Refresh")]
     [ExportMetadata("Description", "Refreshes the list of devices for a given category. Use it to find a device after you turned on a switch.")]
     [ExportMetadata("Icon", "DL_Link_SVG")]
     [ExportMetadata("Category", "DL Link")]
@@ -93,7 +78,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The time in seconds to wait before the rescan is triggered
         /// </summary>
         /// <remarks>
         /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change

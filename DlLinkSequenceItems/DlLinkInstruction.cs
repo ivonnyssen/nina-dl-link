@@ -15,25 +15,10 @@ using System.Windows;
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
     /// <summary>
-    /// This Class shows the basic principle on how to add a new Sequence Instruction to the N.I.N.A. sequencer via the plugin interface
-    /// For ease of use this class inherits the abstract SequenceItem which already handles most of the running logic, like logging, exception handling etc.
-    /// A complete custom implementation by just implementing ISequenceItem is possible too
-    /// The following MetaData can be set to drive the initial values
-    /// --> Name - The name that will be displayed for the item
-    /// --> Description - a brief summary of what the item is doing. It will be displayed as a tooltip on mouseover in the application
-    /// --> Icon - a string to the key value of a Geometry inside N.I.N.A.'s geometry resources
-    ///
-    /// If the item has some preconditions that should be validated, it shall also extend the IValidatable interface and add the validation logic accordingly.
+    /// This sequence item will turn on, off or cycle a DL Link outlet. It can also wait for a specified time and refresh a list of devices after the action is performed.
     /// </summary>
-    /// <remarks>
-    /// The constructor marked with [ImportingConstructor] will be used to import and construct the object
-    /// General device interfaces can be added to the constructor parameters and will be automatically injected on instantiation by the plugin loader
-    /// </remarks>
-    /// <remarks>
-    /// Available interfaces to be injected:
-    /// </remarks>
     [ExportMetadata("Name", "DL Link Action")]
-    [ExportMetadata("Description", "Turn an outlet on, off, or cycle it. THen you can optionally wait and refresh a specified list of devices.")]
+    [ExportMetadata("Description", "Turn an outlet on, off, or cycle it. Then optionally wait and refresh a specified list of devices.")]
     [ExportMetadata("Icon", "DL_Link_SVG")]
     [ExportMetadata("Category", "DL Link")]
     [Export(typeof(ISequenceItem))]
@@ -93,44 +78,39 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The number of the outlet that should be controlled. Outlet numbers start at 0.
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
+        private int outletNumber;
+
         [JsonProperty]
-        public int OutletNumber { get; set; }
+        public int OutletNumber { get => outletNumber; set { outletNumber = value; RaisePropertyChanged(); } }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The actions that can should be performed on the outlet: On, Off, Cycle
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
+        private OutletActions action;
+
         [JsonProperty]
-        public OutletActions Action { get; set; }
+        public OutletActions Action { get => action; set { action = value; RaisePropertyChanged(); } }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The delay time in seconds that should be waited after the action is performed. This delay is only used if the Rescan property is set to something other than None.
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
+        private int delay = 2;
+
         [JsonProperty]
-        public int Delay { get; set; } = 2;
+        public int Delay { get => delay; set { delay = value; RaisePropertyChanged(); } }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The rescan action that should be performed after the outlet action is performed. This is only used if the Rescan property is set to something other than None.
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
+        private Mediators rescan = Mediators.None;
+
         [JsonProperty]
-        public Mediators Rescan { get; set; } = Mediators.None;
+        public Mediators Rescan { get => rescan; set { rescan = value; RaisePropertyChanged(); } }
 
         /// <summary>
-        /// The core logic when the sequence item is running resides here
-        /// Add whatever action is necessary
+        /// Logic to check the outlet state, trigger the action and then trigger a rescan if requested.
         /// </summary>
         /// <param name="progress">The application status progress that can be sent back during execution</param>
         /// <param name="token">When a cancel signal is triggered from outside, this token can be used to register to it or check if it is cancelled</param>
@@ -165,13 +145,16 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
             } else {
                 Logger.Error($"Failed to trigger outlet {OutletNumber} to {Action}");
             }
+
+            // return early if no rescan is requested
+            if (Rescan == Mediators.None) {
+                return;
+            }
+
             //wait for the delay time
             await Task.Delay(Math.Abs(Delay) * 1000, token);
             //trigger a Rescan if requested
             switch (Rescan) {
-                case Mediators.None:
-                    break;
-
                 case Mediators.Camera:
                     await cameraMediator.Rescan();
                     break;
@@ -215,6 +198,10 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
                 case Mediators.FlatDevice:
                     await flatDeviceMediator.Rescan();
                     break;
+
+                default:
+                    Logger.Error($"Rescan {Rescan} is not supported");
+                    break;
             }
 
             return;
@@ -233,7 +220,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(DlLinkInstruction)}, Text: {OutletNumber}";
+            return $"Category: {Category}, Item: {nameof(DlLinkInstruction)}, Outlet: {OutletNumber}, Action: {Action}, Delay: {Delay}, Rescan: {Rescan}.";
         }
 
         private readonly ICameraMediator cameraMediator;
@@ -248,9 +235,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         private readonly IWeatherDataMediator weatherDataMediator;
         private readonly ISafetyMonitorMediator safetyMonitorMediator;
 
+        #region mock properties
+
         public HttpClient HttpClient { get; set; } = null;
         public string ServerAddress { get; set; } = Properties.Settings.Default.ServerAddress;
         public string UserName { get; set; } = Properties.Settings.Default.Username;
         public string Password { get; set; } = Properties.Settings.Default.Password;
+
+        #endregion mock properties
     }
 }
