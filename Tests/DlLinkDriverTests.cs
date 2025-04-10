@@ -1,162 +1,158 @@
-using Xunit;
-using Moq;
-using NINA.Profile.Interfaces;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using IgorVonNyssen.NINA.DlLink;
 using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
-using System.Collections.Generic;
+using Moq;
 using Moq.Protected;
 using NINA.Equipment.Interfaces;
+using System.Net;
 
-public class DlLinkDriverTests {
+namespace IgorVonNyssen.NINA.DlLink.Tests {
 
-    [Fact]
-    public async Task Connect_ShouldReturnTrue_WhenResponseIsSuccessful() {
-        // Arrange
-        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage {
-                StatusCode = HttpStatusCode.MultiStatus,
-                Content = new StringContent("[\"Outlet1\", \"Outlet2\"]")
-            })
-            .Verifiable();
+    public class DlLinkDriverTests {
 
-        var httpClient = new HttpClient(handlerMock.Object);
+        [Fact]
+        public async Task Connect_ShouldReturnTrue_WhenResponseIsSuccessful() {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.MultiStatus,
+                    Content = new StringContent("[\"Outlet1\", \"Outlet2\"]")
+                })
+                .Verifiable();
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var httpClient = new HttpClient(handlerMock.Object);
 
-        // Act
-        var result = await dlLinkDriver.Connect(CancellationToken.None);
+            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
-        // Assert
-        Assert.True(result);
-        Assert.True(dlLinkDriver.Connected);
-        Assert.Equal(2, ((ISwitchHub)dlLinkDriver).Switches.Count);
-    }
+            // Act
+            var result = await dlLinkDriver.Connect(CancellationToken.None);
 
-    [Fact]
-    public async Task Connect_ShouldReturnFalse_WhenResponseIsUnsuccessful() {
-        // Arrange
-        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage {
-                StatusCode = HttpStatusCode.BadRequest,
-                Content = new StringContent("Bad Request")
-            })
-            .Verifiable();
+            // Assert
+            Assert.True(result);
+            Assert.True(dlLinkDriver.Connected);
+            Assert.Equal(2, ((ISwitchHub)dlLinkDriver).Switches.Count);
+        }
 
-        var httpClient = new HttpClient(handlerMock.Object);
+        [Fact]
+        public async Task Connect_ShouldReturnFalse_WhenResponseIsUnsuccessful() {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Content = new StringContent("Bad Request")
+                })
+                .Verifiable();
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var httpClient = new HttpClient(handlerMock.Object);
 
-        // Act
-        var result = await dlLinkDriver.Connect(CancellationToken.None);
+            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
-        // Assert
-        Assert.False(result);
-        Assert.False(dlLinkDriver.Connected);
-        Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
-    }
+            // Act
+            var result = await dlLinkDriver.Connect(CancellationToken.None);
 
-    [Fact]
-    public async Task Connect_ShouldReturnWithoutOutlets_WhenResponseIsEmpty() {
-        // Arrange
-        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage {
-                StatusCode = HttpStatusCode.MultiStatus,
-                Content = new StringContent("[]")
-            })
-            .Verifiable();
+            // Assert
+            Assert.False(result);
+            Assert.False(dlLinkDriver.Connected);
+            Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+        }
 
-        var httpClient = new HttpClient(handlerMock.Object);
+        [Fact]
+        public async Task Connect_ShouldReturnWithoutOutlets_WhenResponseIsEmpty() {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.MultiStatus,
+                    Content = new StringContent("[]")
+                })
+                .Verifiable();
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var httpClient = new HttpClient(handlerMock.Object);
 
-        // Act
-        var result = await dlLinkDriver.Connect(CancellationToken.None);
+            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
-        // Assert
-        Assert.True(result);
-        Assert.True(dlLinkDriver.Connected);
-        Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
-    }
+            // Act
+            var result = await dlLinkDriver.Connect(CancellationToken.None);
 
-    [Fact]
-    public async Task Connect_ShouldReturnFalse_WhenResponseIsInvalidJson() {
-        // Arrange
-        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage {
-                StatusCode = HttpStatusCode.MultiStatus,
-                Content = new StringContent("")
-            })
-            .Verifiable();
+            // Assert
+            Assert.True(result);
+            Assert.True(dlLinkDriver.Connected);
+            Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+        }
 
-        var httpClient = new HttpClient(handlerMock.Object);
+        [Fact]
+        public async Task Connect_ShouldReturnFalse_WhenResponseIsInvalidJson() {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.MultiStatus,
+                    Content = new StringContent("")
+                })
+                .Verifiable();
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var httpClient = new HttpClient(handlerMock.Object);
 
-        // Act
-        var result = await dlLinkDriver.Connect(CancellationToken.None);
+            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
-        // Assert
-        Assert.False(result);
-        Assert.False(dlLinkDriver.Connected);
-        Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
-    }
+            // Act
+            var result = await dlLinkDriver.Connect(CancellationToken.None);
 
-    [Fact]
-    public async Task Connect_ShouldReturnFalse_WhenServerTimesOut() {
-        // Arrange
-        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ThrowsAsync(new TaskCanceledException())
-            .Verifiable();
+            // Assert
+            Assert.False(result);
+            Assert.False(dlLinkDriver.Connected);
+            Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+        }
 
-        var httpClient = new HttpClient(handlerMock.Object);
+        [Fact]
+        public async Task Connect_ShouldReturnFalse_WhenServerTimesOut() {
+            // Arrange
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ThrowsAsync(new TaskCanceledException())
+                .Verifiable();
 
-        var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var httpClient = new HttpClient(handlerMock.Object);
 
-        // Act
-        var result = await dlLinkDriver.Connect(CancellationToken.None);
+            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
-        // Assert
-        Assert.False(result);
-        Assert.False(dlLinkDriver.Connected);
-        Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+            // Act
+            var result = await dlLinkDriver.Connect(CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            Assert.False(dlLinkDriver.Connected);
+            Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+        }
     }
 }

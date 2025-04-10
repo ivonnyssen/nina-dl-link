@@ -2,16 +2,11 @@
 using NINA.Equipment.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net;
-using System.Text;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.Json;
-using IgorVonNyssen.NINA.DlLink.Properties;
-using NINA.Profile.Interfaces;
-using NINA.Profile;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
@@ -54,40 +49,24 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 Credentials = new NetworkCredential(userName, password)
             };
             var httpClient = this.httpClient ?? new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            switch (await HttpUtils.GetOutletNames(httpClient, serverAddress, token)) {
+                case { IsOk: true, Value: var outletNames }:
+                    switches.Clear();
+                    var counter = 0;
+                    foreach (var outletName in outletNames) {
+                        switches.Add(new DlOutlet(outletName, counter));
+                        counter++;
+                        Logger.Debug($"Outlet name: {outletName}");
+                    }
+                    Connected = true;
+                    Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}");
+                    break;
 
-            HttpResponseMessage response;
-            string responseBody;
-            try {
-                response = await httpClient.GetAsync($"http://{serverAddress}/restapi/relay/outlets/all;/name/", token);
-                responseBody = await response.Content.ReadAsStringAsync(token);
-                if (response.StatusCode != HttpStatusCode.MultiStatus) {
-                    Logger.Error($"Response: {response.StatusCode}");
-                    Logger.Error($"Response: {responseBody}");
+                default:
                     Logger.Error($"Failed to connect to {serverAddress}");
-                    return false;
-                }
-            } catch (Exception ex) {
-                Logger.Error($"Failed to connect to {serverAddress}: {ex.Message}");
-                return false;
+                    Connected = false;
+                    break;
             }
-
-            List<string> outletNames;
-            try { outletNames = JsonSerializer.Deserialize<List<string>>(responseBody); } catch (JsonException ex) {
-                Logger.Error($"Failed to parse outlet names from {serverAddress}: {ex.Message}");
-                return false;
-            }
-            Logger.Debug($"Outlet names: {string.Join(", ", outletNames)}");
-
-            switches.Clear();
-            var counter = 0;
-            foreach (var outletName in outletNames) {
-                switches.Add(new DlOutlet(outletName, counter));
-                counter++;
-                Logger.Debug($"Outlet name: {outletName}");
-            }
-            Connected = true;
 
             return Connected;
         }

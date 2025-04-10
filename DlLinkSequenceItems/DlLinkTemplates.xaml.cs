@@ -6,9 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace IgorVonNyssen.NINA.DlLink.DlLinkTestCategory {
+namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
+
     [Export(typeof(ResourceDictionary))]
     public partial class PluginItemTemplate : ResourceDictionary {
+
         public PluginItemTemplate() {
             InitializeComponent();
         }

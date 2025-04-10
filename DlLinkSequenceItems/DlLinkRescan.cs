@@ -15,18 +15,18 @@ using System.Windows;
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
     /// <summary>
-    /// This sequence item will turn on, off or cycle a DL Link outlet. It can also wait for a specified time and refresh a list of devices after the action is performed.
+    /// Refreshes the list of devices for a given category. Use it to find a device after you turned on a switch.
     /// </summary>
-    [ExportMetadata("Name", "DL Link Action")]
-    [ExportMetadata("Description", "Turn an outlet on, off, or cycle it. Then optionally wait and refresh a specified list of devices.")]
+    [ExportMetadata("Name", "DL Link Refresh")]
+    [ExportMetadata("Description", "Refreshes the list of devices for a given category. Use it to find a device after you turned on a switch.")]
     [ExportMetadata("Icon", "DL_Link_SVG")]
     [ExportMetadata("Category", "DL Link")]
     [Export(typeof(ISequenceItem))]
     [JsonObject(MemberSerialization.OptIn)]
-    public class DlLinkInstruction : SequenceItem {
+    public class DlLinkRescan : SequenceItem {
 
         [ImportingConstructor]
-        public DlLinkInstruction(ICameraMediator cameraMediator,
+        public DlLinkRescan(ICameraMediator cameraMediator,
             IFocuserMediator focuserMediator,
             IFilterWheelMediator filterWheelMediator,
             ITelescopeMediator telescopeMediator,
@@ -51,7 +51,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
             weatherDataMediator,
             safetyMonitorMediator) { }
 
-        private DlLinkInstruction(DlLinkInstruction copyMe,
+        private DlLinkRescan(DlLinkRescan copyMe,
             ICameraMediator cameraMediator,
             IFocuserMediator focuserMediator,
             IFilterWheelMediator filterWheelMediator,
@@ -78,83 +78,38 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         }
 
         /// <summary>
-        /// The number of the outlet that should be controlled. Outlet numbers start at 0.
+        /// The time in seconds to wait before the rescan is triggered
         /// </summary>
-        private int outletNumber;
-
+        /// <remarks>
+        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
+        /// </remarks>
         [JsonProperty]
-        public int OutletNumber { get => outletNumber; set { outletNumber = value; RaisePropertyChanged(); } }
+        public int Delay { get; set; } = 0;
 
         /// <summary>
-        /// The actions that can should be performed on the outlet: On, Off, Cycle
+        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
         /// </summary>
-        private OutletActions action;
-
+        /// <remarks>
+        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
+        /// </remarks>
         [JsonProperty]
-        public OutletActions Action { get => action; set { action = value; RaisePropertyChanged(); } }
+        public Mediators Rescan { get; set; } = Mediators.None;
 
         /// <summary>
-        /// The delay time in seconds that should be waited after the action is performed. This delay is only used if the Rescan property is set to something other than None.
-        /// </summary>
-        private int delay = 2;
-
-        [JsonProperty]
-        public int Delay { get => delay; set { delay = value; RaisePropertyChanged(); } }
-
-        /// <summary>
-        /// The rescan action that should be performed after the outlet action is performed. This is only used if the Rescan property is set to something other than None.
-        /// </summary>
-        private Mediators rescan = Mediators.None;
-
-        [JsonProperty]
-        public Mediators Rescan { get => rescan; set { rescan = value; RaisePropertyChanged(); } }
-
-        /// <summary>
-        /// Logic to check the outlet state, trigger the action and then trigger a rescan if requested.
+        /// The core logic when the sequence item is running resides here
+        /// Add whatever action is necessary
         /// </summary>
         /// <param name="progress">The application status progress that can be sent back during execution</param>
         /// <param name="token">When a cancel signal is triggered from outside, this token can be used to register to it or check if it is cancelled</param>
         /// <returns></returns>
         public override async Task Execute(IProgress<ApplicationStatus> progress, CancellationToken token) {
-            if (OutletNumber < 0) {
-                Logger.Error($"Outlet number {OutletNumber} is invalid");
-                return;
-            }
-
-            //get the current state of the outlet
-            var handler = new HttpClientHandler() {
-                Credentials = new NetworkCredential(UserName, Password)
-            };
-            var httpClient = this.HttpClient ?? new HttpClient(handler);
-            var result = await HttpUtils.GetOutletState(httpClient, ServerAddress, OutletNumber, token);
-            if (result.IsErr) {
-                Logger.Error($"Failed to get outlet state for {OutletNumber}");
-                return;
-            }
-
-            //check if the outlet is already in the desired state
-            if (result.Value == (Action == OutletActions.On)) {
-                Logger.Debug($"Outlet {OutletNumber} is already in the desired state");
-                return;
-            }
-
-            //if not, trigger the desired outlet action
-            result = await HttpUtils.TriggerOutletAction(httpClient, ServerAddress, OutletNumber, Action, token);
-            if (result.IsOk) {
-                Logger.Debug($"Triggered outlet {OutletNumber} to {Action}");
-            } else {
-                Logger.Error($"Failed to trigger outlet {OutletNumber} to {Action}");
-            }
-
-            // return early if no rescan is requested
-            if (Rescan == Mediators.None) {
-                return;
-            }
-
             //wait for the delay time
             await Task.Delay(Math.Abs(Delay) * 1000, token);
             //trigger a Rescan if requested
             switch (Rescan) {
+                case Mediators.None:
+                    break;
+
                 case Mediators.Camera:
                     await cameraMediator.Rescan();
                     break;
@@ -198,10 +153,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
                 case Mediators.FlatDevice:
                     await flatDeviceMediator.Rescan();
                     break;
-
-                default:
-                    Logger.Error($"Rescan {Rescan} is not supported");
-                    break;
             }
 
             return;
@@ -212,7 +163,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override object Clone() {
-            return new DlLinkInstruction(this, cameraMediator, focuserMediator, filterWheelMediator, telescopeMediator, guiderMediator, rotatorMediator, domeMediator, switchMediator, flatDeviceMediator, weatherDataMediator, safetyMonitorMediator);
+            return new DlLinkRescan(this, cameraMediator, focuserMediator, filterWheelMediator, telescopeMediator, guiderMediator, rotatorMediator, domeMediator, switchMediator, flatDeviceMediator, weatherDataMediator, safetyMonitorMediator);
         }
 
         /// <summary>
@@ -220,7 +171,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(DlLinkInstruction)}, Outlet: {OutletNumber}, Action: {Action}, Delay: {Delay}, Rescan: {Rescan}.";
+            return $"Category: {Category}, Item: {nameof(DlLinkRescan)}, Device class: {Rescan}";
         }
 
         private readonly ICameraMediator cameraMediator;
@@ -235,13 +186,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         private readonly IWeatherDataMediator weatherDataMediator;
         private readonly ISafetyMonitorMediator safetyMonitorMediator;
 
-        #region mock properties
-
         public HttpClient HttpClient { get; set; } = null;
         public string ServerAddress { get; set; } = Properties.Settings.Default.ServerAddress;
         public string UserName { get; set; } = Properties.Settings.Default.Username;
         public string Password { get; set; } = Properties.Settings.Default.Password;
-
-        #endregion mock properties
     }
 }

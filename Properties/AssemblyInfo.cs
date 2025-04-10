@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("ChangelogURL", "https://github.com/ivonnyssen/nina-dl-link/CHANGELOG.md")]
 
 //[Optional] The url to a featured logo that will be displayed in the plugin list next to the name
-[assembly: AssemblyMetadata("FeaturedImageURL", "")]
+[assembly: AssemblyMetadata("FeaturedImageURL", "https://avatars.githubusercontent.com/u/14805118?s=200&v=4")]
 //[Optional] A url to an example screenshot of your plugin in action
 [assembly: AssemblyMetadata("ScreenshotURL", "")]
 //[Optional] An additional url to an example example screenshot of your plugin in action
