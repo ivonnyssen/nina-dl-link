@@ -162,7 +162,21 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override object Clone() {
-            return new DlLinkRescan(this, cameraMediator, focuserMediator, filterWheelMediator, telescopeMediator, guiderMediator, rotatorMediator, domeMediator, switchMediator, flatDeviceMediator, weatherDataMediator, safetyMonitorMediator);
+            return new DlLinkRescan(this,
+                cameraMediator,
+                focuserMediator,
+                filterWheelMediator,
+                telescopeMediator,
+                guiderMediator,
+                rotatorMediator,
+                domeMediator,
+                switchMediator,
+                flatDeviceMediator,
+                weatherDataMediator,
+                safetyMonitorMediator) {
+                Delay = delay,
+                Rescan = rescan
+            };
         }
 
         /// <summary>
@@ -170,7 +184,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(DlLinkRescan)}, Device class: {Rescan}";
+            return $"Category: {Category}, Item: {nameof(DlLinkRescan)}, Delay: {Delay}, Equipment: {Rescan}";
         }
 
         private readonly ICameraMediator cameraMediator;
