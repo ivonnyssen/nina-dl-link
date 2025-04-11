@@ -1,13 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
-using NINA.Core.Utility;
+﻿using NINA.Core.Utility;
 using NINA.Equipment.Interfaces;
-using NINA.Profile.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using System.Text.Json;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
@@ -34,13 +30,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             return success;
         }
 
-        async Task IWritableSwitch.SetValue() {
+        Task IWritableSwitch.SetValue() {
             var handler = new HttpClientHandler() {
                 Credentials = new NetworkCredential(userName, password)
             };
             var httpClient = this.httpClient ?? new HttpClient(handler);
             bool valueToSet = Math.Abs(this.TargetValue - 1d) < Double.Epsilon;
-            switch (await HttpUtils.SetOutletState(httpClient, serverAddress, OutletNumber, valueToSet, default)) {
+            switch (HttpUtils.SetOutletState(httpClient, serverAddress, OutletNumber, valueToSet, default).Result) {
                 case { IsOk: true }:
                     Logger.Debug($"Set value for outlet {OutletNumber}: " + valueToSet.ToString().ToLower());
                     break;
@@ -48,10 +44,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                 default:
                     break;
             }
+            return Task.CompletedTask;
         }
 
         public short Id { get; private set; }
-        public string Name { get; private set; } = name;
+
+        private string name = name;
+        public string Name { get => name; private set { name = value; RaisePropertyChanged(); } }
         public string Description { get; private set; }
 
         private double value = 0d;
@@ -63,15 +62,16 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             }
         }
 
-        public int OutletNumber { get; private set; } = outletNumber;
-
-        private double targetValue;
+        private int outletNumber = outletNumber;
+        public int OutletNumber { get => outletNumber; private set { outletNumber = value; RaisePropertyChanged(); } }
 
         public double Maximum => 1d;
 
         public double Minimum => 0d;
 
         public double StepSize => 1d;
+
+        private double targetValue;
 
         public double TargetValue {
             get => targetValue; set {
@@ -80,9 +80,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             }
         }
 
+        #region mock properties
+
         private readonly HttpClient httpClient = mockClient;
         private readonly string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
         private readonly string userName = mockUsername ?? Properties.Settings.Default.Username;
         private readonly string password = mockPassword ?? Properties.Settings.Default.Password;
+
+        #endregion mock properties
     }
 }

@@ -20,6 +20,15 @@
     </ObjectDataProvider>
 
     <ObjectDataProvider
+        x:Key="OutletStatesProvider"
+        MethodName="GetValues"
+        ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="local:OutletStates" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+
+    <ObjectDataProvider
         x:Key="MediatorsProvider"
         MethodName="GetValues"
         ObjectType="{x:Type sys:Enum}">
@@ -50,7 +59,7 @@
                             <TextBox.Text>
                                 <Binding Mode="TwoWay" Path="OutletNumber">
                                     <Binding.ValidationRules>
-                                        <rules:GreaterZeroRule />
+                                        <rules:GreaterThanZeroRule />
                                     </Binding.ValidationRules>
                                 </Binding>
                             </TextBox.Text>
@@ -110,7 +119,7 @@
                             <TextBox.Text>
                                 <Binding Mode="TwoWay" Path="OutletNumber">
                                     <Binding.ValidationRules>
-                                        <rules:GreaterZeroRule />
+                                        <rules:GreaterThanZeroRule />
                                     </Binding.ValidationRules>
                                 </Binding>
                             </TextBox.Text>
@@ -170,12 +179,12 @@
                             TextAlignment="Right" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock VerticalAlignment="Center" Text="Action" />
-                        <TextBox
+                        <TextBlock VerticalAlignment="Center" Text="State" />
+                        <ComboBox
                             MinWidth="40"
                             Margin="5,0,0,0"
-                            Text="{Binding State}"
-                            TextAlignment="Right" />
+                            ItemsSource="{Binding Source={StaticResource OutletStatesProvider}}"
+                            SelectedItem="{Binding State}" />
                     </StackPanel>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
@@ -196,11 +205,12 @@
                             TextAlignment="Right" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock VerticalAlignment="Center" Text="Action" />
-                        <TextBox
+                        <TextBlock VerticalAlignment="Center" Text="State" />
+                        <ComboBox
                             MinWidth="40"
-                            Text="{Binding State}"
-                            TextAlignment="Right" />
+                            Margin="5,0,0,0"
+                            ItemsSource="{Binding Source={StaticResource OutletStatesProvider}}"
+                            SelectedItem="{Binding State}" />
                     </StackPanel>
                 </StackPanel>
             </mini:MiniSequenceItem.SequenceItemContent>

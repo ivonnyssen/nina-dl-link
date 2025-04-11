@@ -4,16 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
     /// <summary>
-    /// This Class shows the basic principle on how to add a new Device driver to N.I.N.A. via the plugin interface
-    /// The DeviceProvider will return an instance of this class as a sample weather device
-    /// For this example the weather data will generate random numbers
+    /// This class implements the ISwitchHub interface for the DlLink driver.
     /// </summary>
     public class DlLinkDriver(string deviceId, HttpClient mockClient = null, string mockServerAddress = null, string mockUsername = null, string mockPassword = null) : BaseINPC, ISwitchHub {
         private readonly ICollection<ISwitch> switches = [];
@@ -34,9 +31,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
         public string Description => "Digital Logger Outlets";
 
-        public string DriverInfo { get; } = $"Serial {deviceId}";
+        public string DriverInfo { get; } = $"Digital Logger IP: {deviceId}";
 
-        public string DriverVersion { get; private set; }
+        public string DriverVersion { get; private set; } = "1.0.0";
 
         public IList<string> SupportedActions => [];
 
@@ -91,9 +88,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             throw new NotImplementedException();
         }
 
+        #region mocked properties
+
         private readonly HttpClient httpClient = mockClient;
         private readonly string serverAddress = mockServerAddress ?? Properties.Settings.Default.ServerAddress;
         private readonly string userName = mockUsername ?? Properties.Settings.Default.Username;
         private readonly string password = mockPassword ?? Properties.Settings.Default.Password;
+
+        #endregion mocked properties
     }
 }

@@ -1,16 +1,13 @@
-﻿using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NINA.Core.Model;
 using NINA.Core.Utility;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Sequencer.SequenceItem;
 using System;
 using System.ComponentModel.Composition;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
@@ -80,36 +77,34 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// <summary>
         /// The time in seconds to wait before the rescan is triggered
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
+        private int delay = 0;
+
         [JsonProperty]
-        public int Delay { get; set; } = 0;
+        public int Delay { get => delay; set { delay = value < 0 ? 0 : value; RaisePropertyChanged(); } }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The type of device to rescan. The default is None, which means no rescan will be triggered.
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
+        private Mediators rescan = Mediators.None;
+
         [JsonProperty]
-        public Mediators Rescan { get; set; } = Mediators.None;
+        public Mediators Rescan { get => rescan; set { rescan = value; RaisePropertyChanged(); } }
 
         /// <summary>
-        /// The core logic when the sequence item is running resides here
-        /// Add whatever action is necessary
+        /// waits for delay seconds if rescan is set to a value other than None
         /// </summary>
         /// <param name="progress">The application status progress that can be sent back during execution</param>
         /// <param name="token">When a cancel signal is triggered from outside, this token can be used to register to it or check if it is cancelled</param>
         /// <returns></returns>
         public override async Task Execute(IProgress<ApplicationStatus> progress, CancellationToken token) {
+            //check if the rescan is set to None, if so, we do not need to wait
+            if (Rescan == Mediators.None) {
+                return;
+            }
             //wait for the delay time
             await Task.Delay(Math.Abs(Delay) * 1000, token);
             //trigger a Rescan if requested
             switch (Rescan) {
-                case Mediators.None:
-                    break;
-
                 case Mediators.Camera:
                     await cameraMediator.Rescan();
                     break;
@@ -153,6 +148,10 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
                 case Mediators.FlatDevice:
                     await flatDeviceMediator.Rescan();
                     break;
+
+                default:
+                    Logger.Error($"Rescan for {Rescan} not implemented");
+                    break;
             }
 
             return;
@@ -186,9 +185,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         private readonly IWeatherDataMediator weatherDataMediator;
         private readonly ISafetyMonitorMediator safetyMonitorMediator;
 
+        #region mock properties
+
         public HttpClient HttpClient { get; set; } = null;
         public string ServerAddress { get; set; } = Properties.Settings.Default.ServerAddress;
         public string UserName { get; set; } = Properties.Settings.Default.Username;
         public string Password { get; set; } = Properties.Settings.Default.Password;
+
+        #endregion mock properties
     }
 }

@@ -17,15 +17,7 @@ using System.Threading.Tasks;
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
     /// <summary>
-    /// This Class shows the basic principle on how to add a new Sequence Trigger to the N.I.N.A. sequencer via the plugin interface
-    /// For ease of use this class inherits the abstract SequenceTrigger which already handles most of the running logic, like logging, exception handling etc.
-    /// A complete custom implementation by just implementing ISequenceTrigger is possible too
-    /// The following MetaData can be set to drive the initial values
-    /// --> Name - The name that will be displayed for the item
-    /// --> Description - a brief summary of what the item is doing. It will be displayed as a tooltip on mouseover in the application
-    /// --> Icon - a string to the key value of a Geometry inside N.I.N.A.'s geometry resources
-    ///
-    /// If the item has some preconditions that should be validated, it shall also extend the IValidatable interface and add the validation logic accordingly.
+    /// The class checks the state of the specified outlet and returns true if it is in the specified state.
     /// </summary>
     [ExportMetadata("Name", "DL Link Check")]
     [ExportMetadata("Description", "Checks the state of the specified outlet and returns true if it is in the specified state.")]
@@ -35,68 +27,32 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
     [JsonObject(MemberSerialization.OptIn)]
     public class DlLinkCondition : SequenceCondition {
 
-        /// <summary>
-        /// The constructor marked with [ImportingConstructor] will be used to import and construct the object
-        /// General device interfaces can be added to the constructor parameters and will be automatically injected on instantiation by the plugin loader
-        /// </summary>
-        /// <remarks>
-        /// Available interfaces to be injected:
-        ///     - IProfileService,
-        ///     - ICameraMediator,
-        ///     - ITelescopeMediator,
-        ///     - IFocuserMediator,
-        ///     - IFilterWheelMediator,
-        ///     - IGuiderMediator,
-        ///     - IRotatorMediator,
-        ///     - IFlatDeviceMediator,
-        ///     - IWeatherDataMediator,
-        ///     - IImagingMediator,
-        ///     - IApplicationStatusMediator,
-        ///     - INighttimeCalculator,
-        ///     - IPlanetariumFactory,
-        ///     - IImageHistoryVM,
-        ///     - IDeepSkyObjectSearchVM,
-        ///     - IDomeMediator,
-        ///     - IImageSaveMediator,
-        ///     - ISwitchMediator,
-        ///     - ISafetyMonitorMediator,
-        ///     - IApplicationMediator
-        ///     - IApplicationResourceDictionary
-        ///     - IFramingAssistantVM
-        ///     - IList<IDateTimeProvider>
-        /// </remarks>
         [ImportingConstructor]
         public DlLinkCondition() {
             outletNumber = 0;
-            state = OutletActions.On;
+            state = OutletStates.On;
         }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The number of the outlet to check. Numbers start at 1.
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
         private int outletNumber;
 
         [JsonProperty]
         public int OutletNumber {
             get => outletNumber; set {
-                outletNumber = value;
+                outletNumber = value < 0 ? 0 : value;
                 RaisePropertyChanged();
             }
         }
 
         /// <summary>
-        /// An example property that can be set from the user interface via the Datatemplate specified in PluginTestItem.Template.xaml
+        /// The state to check for. The outlet can be on or off.
         /// </summary>
-        /// <remarks>
-        /// If the property changes from the code itself, remember to call RaisePropertyChanged() on it for the User Interface to notice the change
-        /// </remarks>
-        private OutletActions state;
+        private OutletStates state;
 
         [JsonProperty]
-        public OutletActions State {
+        public OutletStates State {
             get => state; set {
                 state = value;
                 RaisePropertyChanged();
@@ -121,9 +77,19 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
                 throw new SequenceEntityFailedException($"Failed to get outlet state for {OutletNumber}");
             }
 
-            if (State == OutletActions.On) return true == result.Value; else if (State == OutletActions.Off) return false == result.Value;
-            //should never be reached as cycle is not a state an outlet can have
-            return false;
+            switch (State) {
+                case OutletStates.On:
+                    Logger.Debug($"Checking outlet {OutletNumber} to be on: {result.Value}");
+                    return true == result.Value;
+
+                case OutletStates.Off:
+                    Logger.Debug($"Checking outlet {OutletNumber} to be off: {result.Value}");
+                    return false == result.Value;
+
+                default:
+                    Logger.Error($"Invalid state for outlet {OutletNumber}: {State}");
+                    throw new SequenceEntityFailedException($"Invalid state for outlet {OutletNumber}: {State}");
+            }
         }
 
         public override object Clone() {
@@ -143,9 +109,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
             return $"Category: {Category}, Item: {nameof(DlLinkCondition)}, Outlet: {OutletNumber}, State: {State}";
         }
 
+        #region mock properties
+
         public HttpClient HttpClient { get; set; } = null;
         public string ServerAddress { get; set; } = Properties.Settings.Default.ServerAddress;
         public string UserName { get; set; } = Properties.Settings.Default.Username;
         public string Password { get; set; } = Properties.Settings.Default.Password;
+
+        #endregion mock properties
     }
 }
