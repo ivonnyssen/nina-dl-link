@@ -28,10 +28,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
     public class HttpUtils {
 
-        public static bool SetState(int outletNumber, OutletActions action) {
-            return true;
-        }
-
         public static async Task<Result<IList<string>>> GetOutletNames(HttpClient httpClient, string serverAddress, CancellationToken token) {
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));

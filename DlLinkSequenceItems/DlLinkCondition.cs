@@ -1,18 +1,12 @@
 ﻿using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NINA.Core.Model;
 using NINA.Core.Utility;
 using NINA.Sequencer.Conditions;
 using NINA.Sequencer.SequenceItem;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
@@ -97,7 +91,9 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
                 Icon = Icon,
                 Name = Name,
                 Category = Category,
-                Description = Description
+                Description = Description,
+                OutletNumber = OutletNumber,
+                State = State,
             };
         }
 
