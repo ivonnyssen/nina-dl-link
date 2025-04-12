@@ -9,7 +9,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
     public class DlLinkInstructionTests {
 
         [Fact]
-        public async Task Execute_ShouldLogError_WhenOutletNumberIsInvalid() {
+        public async Task Execute_ShouldNotThrowException_WhenOutletNumberIsInvalid() {
             // Arrange
             // Mock mediators
             var mockCameraMediator = new Mock<ICameraMediator>();
@@ -43,19 +43,16 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Act
             await instruction.Execute(null, CancellationToken.None);
-
-            // Assert
-            // Verify that an error was logged (you can mock the logger if needed)
         }
 
         [Fact]
-        public async Task Execute_ShouldLogError_WhenGetOutletStateFails() {
+        public async Task Execute_ShouldNothTrowException_WhenGetOutletStateFails() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
             var serverAddress = "localhost";
             var outletNumber = 1;
 
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.InternalServerError); // Simulate failure
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -96,7 +93,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             await instruction.Execute(null, CancellationToken.None);
 
             // Assert
-            // Verify that an error was logged
+            mockHttpMessageHandler.VerifyNoOutstandingExpectation(); // Ensure no unexpected requests were made
+            mockHttpMessageHandler.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -106,7 +104,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var serverAddress = "localhost";
             var outletNumber = 1;
 
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "true"); // Simulate outlet is already ON
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -148,7 +146,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             await instruction.Execute(null, CancellationToken.None);
 
             // Assert
-            // Verify that no action was triggered
+            mockHttpMessageHandler.VerifyNoOutstandingExpectation(); // Ensure no unexpected requests were made
+            mockHttpMessageHandler.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -158,10 +157,10 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var serverAddress = "localhost";
             var outletNumber = 1;
 
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "false"); // Simulate outlet is OFF
 
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect(HttpMethod.Put, $"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.NoContent); // Simulate successful action
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -203,7 +202,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             await instruction.Execute(null, CancellationToken.None);
 
             // Assert
-            // Verify that the action was triggered
+            mockHttpMessageHandler.VerifyNoOutstandingExpectation(); // Ensure no unexpected requests were made
+            mockHttpMessageHandler.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -214,10 +214,10 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
 
             // Mock the HTTP response for the outlet state
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "false"); // Simulate the outlet being OFF
 
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.NoContent); // Simulate successful action
 
             var mockSwitchMediator = new Mock<ISwitchMediator>();
@@ -261,6 +261,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             await instruction.Execute(null, CancellationToken.None);
 
             // Assert
+            mockHttpMessageHandler.VerifyNoOutstandingExpectation(); // Ensure no unexpected requests were made
+            mockHttpMessageHandler.VerifyNoOutstandingRequest();
             mockSwitchMediator.Verify(m => m.Rescan(), Times.Once);
         }
 
@@ -268,10 +270,14 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         public void Execute_ShouldWaitForDelay_WhenDelayIsSpecified() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            // Mock the HTTP response for the outlet state
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "false"); // Simulate outlet is OFF
 
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            mockHttpMessageHandler.When(HttpMethod.Put, $"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.NoContent); // Simulate successful action
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -283,8 +289,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var mockTelescopeMediator = new Mock<ITelescopeMediator>();
             var mockGuiderMediator = new Mock<IGuiderMediator>();
             var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
             var mockSwitchMediator = new Mock<ISwitchMediator>();
+            var mockDomeMediator = new Mock<IDomeMediator>();
             var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
             var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
             var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
@@ -304,20 +310,18 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 mockSafetyMonitorMediator.Object
             ) {
                 HttpClient = httpClient,
-                ServerAddress = "http://localhost",
-                OutletNumber = 1,
+                ServerAddress = serverAddress,
+                OutletNumber = outletNumber,
                 Action = OutletActions.On, // Desired state is ON
+                Rescan = Mediators.Switch, // Request rescan for switches
                 Delay = 5 // 5-second delay
             };
 
-            var cancellationTokenSource = new CancellationTokenSource();
-
             // Act
-            var task = instruction.Execute(null, cancellationTokenSource.Token);
+            var task = instruction.Execute(null, CancellationToken.None);
 
             // Assert
             Assert.False(task.IsCompleted); // Ensure the delay is respected
-            cancellationTokenSource.Cancel(); // Cancel the task to clean up
         }
 
         [Fact]
@@ -420,7 +424,11 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         public async Task Execute_ShouldLogError_WhenOutletStateIsInvalid() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            // Mock the HTTP response for the outlet state
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "invalid_state"); // Simulate an invalid outlet state
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -453,8 +461,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 mockSafetyMonitorMediator.Object
             ) {
                 HttpClient = httpClient,
-                ServerAddress = "http://localhost",
-                OutletNumber = 1,
+                ServerAddress = serverAddress,
+                OutletNumber = outletNumber,
                 Action = OutletActions.On // Desired state is ON
             };
 
@@ -462,7 +470,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             await instruction.Execute(null, CancellationToken.None);
 
             // Assert
-            // Verify that an error was logged (you can mock the logger if needed)
+            mockHttpMessageHandler.VerifyNoOutstandingExpectation(); // Ensure no unexpected requests were made
+            mockHttpMessageHandler.VerifyNoOutstandingRequest();
         }
     }
 }
