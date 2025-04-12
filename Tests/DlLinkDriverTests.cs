@@ -154,5 +154,25 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.False(dlLinkDriver.Connected);
             Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
         }
+
+        [Fact]
+        public void Disconnect_ShouldClearSwitches() {
+            // Arrange
+            var mockHttpClient = new Mock<HttpClient>();
+            var dlLinkDriver = new DlLinkDriver("TestDevice", mockHttpClient.Object, "localhost");
+
+            // Simulate adding switches to the collection
+            var switches = (ICollection<ISwitch>)((ISwitchHub)dlLinkDriver).Switches;
+            switches.Add(new DlOutlet("Outlet1", 0));
+            switches.Add(new DlOutlet("Outlet2", 1));
+
+            Assert.Equal(2, switches.Count); // Ensure switches are added
+
+            // Act
+            dlLinkDriver.Disconnect();
+
+            // Assert
+            Assert.Empty(switches); // Ensure switches are cleared
+        }
     }
 }
