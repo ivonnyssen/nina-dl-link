@@ -1,12 +1,6 @@
-using Xunit;
-using Moq;
-using System.Net.Http;
 using IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems;
-using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
+using Moq;
 using NINA.Core.Model;
-using NINA.Sequencer.SequenceItem;
-using System.Threading.Tasks;
-using System;
 using RichardSzalay.MockHttp;
 using System.Net;
 
@@ -93,6 +87,32 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 Password = "password",
                 OutletNumber = outletNumber,
                 State = OutletStates.On
+            };
+
+            // Act & Assert
+            Assert.Throws<SequenceEntityFailedException>(() => condition.Check(null, null));
+        }
+
+        [Fact]
+        public void Check_ShouldThrowException_ForInvalidState() {
+            // Arrange
+            var mockHttpMessageHandler = new MockHttpMessageHandler();
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            // Mock the HTTP response for the outlet state
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                .Respond("application/json", "true"); // Simulate the outlet being ON
+
+            var httpClient = new HttpClient(mockHttpMessageHandler);
+
+            var condition = new DlLinkCondition {
+                HttpClient = httpClient,
+                ServerAddress = serverAddress,
+                UserName = "user",
+                Password = "password",
+                OutletNumber = outletNumber,
+                State = (OutletStates)999 // Invalid state
             };
 
             // Act & Assert
