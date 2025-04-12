@@ -7,6 +7,8 @@ using NINA.Core.Model;
 using NINA.Sequencer.SequenceItem;
 using System.Threading.Tasks;
 using System;
+using RichardSzalay.MockHttp;
+using System.Net;
 
 namespace IgorVonNyssen.NINA.DlLink.Tests {
 
@@ -16,20 +18,24 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         [Fact]
         public void Check_ShouldReturnTrue_WhenOutletStateMatchesExpectedState_On() {
             // Arrange
+            var mockHttpMessageHandler = new MockHttpMessageHandler();
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            // Mock the HTTP response for the outlet state
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                .Respond("application/json", "true"); // Simulate the outlet being ON
+
+            var httpClient = new HttpClient(mockHttpMessageHandler);
+
             var condition = new DlLinkCondition {
-                HttpClient = mockHttpClient.Object,
-                ServerAddress = "http://localhost",
+                HttpClient = httpClient,
+                ServerAddress = serverAddress,
                 UserName = "user",
                 Password = "password",
-                OutletNumber = 1,
-                State = OutletStates.On
+                OutletNumber = outletNumber,
+                State = OutletStates.On // Expecting the outlet to be ON
             };
-
-            // Mock HttpUtils.GetOutletState to return true
-            var mockResult = Result<bool>.Ok(true);
-            Mock.Get(HttpUtils.GetOutletState)
-                .Setup(m => m(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockResult);
 
             // Act
             var result = condition.Check(null, null);
@@ -41,20 +47,24 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         [Fact]
         public void Check_ShouldReturnFalse_WhenOutletStateDoesNotMatchExpectedState_Off() {
             // Arrange
+            var mockHttpMessageHandler = new MockHttpMessageHandler();
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            // Mock the HTTP response for the outlet state
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                .Respond("application/json", "true"); // Simulate the outlet being ON
+
+            var httpClient = new HttpClient(mockHttpMessageHandler);
+
             var condition = new DlLinkCondition {
-                HttpClient = mockHttpClient.Object,
-                ServerAddress = "http://localhost",
+                HttpClient = httpClient,
+                ServerAddress = serverAddress,
                 UserName = "user",
                 Password = "password",
-                OutletNumber = 1,
-                State = OutletStates.Off
+                OutletNumber = outletNumber,
+                State = OutletStates.Off // Expecting the outlet to be OFF
             };
-
-            // Mock HttpUtils.GetOutletState to return true
-            var mockResult = Result<bool>.Ok(true);
-            Mock.Get(HttpUtils.GetOutletState)
-                .Setup(m => m(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockResult);
 
             // Act
             var result = condition.Check(null, null);
@@ -66,20 +76,24 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         [Fact]
         public void Check_ShouldThrowException_WhenHttpUtilsFails() {
             // Arrange
+            var mockHttpMessageHandler = new MockHttpMessageHandler();
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            // Mock the HTTP response for the outlet state
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                .Respond(HttpStatusCode.NotFound);
+
+            var httpClient = new HttpClient(mockHttpMessageHandler);
+
             var condition = new DlLinkCondition {
-                HttpClient = mockHttpClient.Object,
-                ServerAddress = "http://localhost",
+                HttpClient = httpClient,
+                ServerAddress = serverAddress,
                 UserName = "user",
                 Password = "password",
-                OutletNumber = 1,
+                OutletNumber = outletNumber,
                 State = OutletStates.On
             };
-
-            // Mock HttpUtils.GetOutletState to return an error
-            var mockResult = Result<bool>.Err();
-            Mock.Get(HttpUtils.GetOutletState)
-                .Setup(m => m(It.IsAny<HttpClient>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockResult);
 
             // Act & Assert
             Assert.Throws<SequenceEntityFailedException>(() => condition.Check(null, null));
