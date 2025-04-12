@@ -1,14 +1,8 @@
-using Xunit;
+using IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems;
 using Moq;
+using NINA.Equipment.Interfaces.Mediator;
 using RichardSzalay.MockHttp;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems;
-using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
-using NINA.Core.Model;
-using NINA.Equipment.Interfaces.Mediator;
 
 namespace IgorVonNyssen.NINA.DlLink.Tests {
 
@@ -58,7 +52,10 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         public async Task Execute_ShouldLogError_WhenGetOutletStateFails() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.InternalServerError); // Simulate failure
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -91,8 +88,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 mockSafetyMonitorMediator.Object
             ) {
                 HttpClient = httpClient,
-                ServerAddress = "http://localhost",
-                OutletNumber = 1
+                ServerAddress = serverAddress,
+                OutletNumber = outletNumber
             };
 
             // Act
@@ -106,7 +103,10 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         public async Task Execute_ShouldSkipAction_WhenOutletIsAlreadyInDesiredState() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "true"); // Simulate outlet is already ON
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -139,8 +139,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 mockSafetyMonitorMediator.Object
             ) {
                 HttpClient = httpClient,
-                ServerAddress = "http://localhost",
-                OutletNumber = 1,
+                ServerAddress = serverAddress,
+                OutletNumber = outletNumber,
                 Action = OutletActions.On // Desired state is ON
             };
 
@@ -155,10 +155,13 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         public async Task Execute_ShouldTriggerAction_WhenOutletIsNotInDesiredState() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "false"); // Simulate outlet is OFF
 
-            mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
+            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.NoContent); // Simulate successful action
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -191,8 +194,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 mockSafetyMonitorMediator.Object
             ) {
                 HttpClient = httpClient,
-                ServerAddress = "http://localhost",
-                OutletNumber = 1,
+                ServerAddress = serverAddress,
+                OutletNumber = outletNumber,
                 Action = OutletActions.On // Desired state is ON
             };
 
@@ -262,7 +265,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         }
 
         [Fact]
-        public async Task Execute_ShouldWaitForDelay_WhenDelayIsSpecified() {
+        public void Execute_ShouldWaitForDelay_WhenDelayIsSpecified() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
             mockHttpMessageHandler.When("http://localhost/restapi/relay/outlets/0/state/")
