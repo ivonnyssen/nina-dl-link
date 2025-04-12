@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.0.0.3")]
-[assembly: AssemblyFileVersion("1.0.0.3")]
+[assembly: AssemblyVersion("1.0.0.1")]
+[assembly: AssemblyFileVersion("1.0.0.1")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("DL Link")]
@@ -50,8 +50,8 @@ using System.Runtime.InteropServices;
 //[Optional] An additional url to an example example screenshot of your plugin in action
 [assembly: AssemblyMetadata("AltScreenshotURL", "https://ivonnyssen.github.io/nina-dl-link/assets/DL-Link-Sequence.png")]
 //[Optional] An in-depth description of your plugin
-[assembly: AssemblyMetadata("LongDescription", @"This plugin allows the control of Power Switches by Digital Logger Inc. It also provides fucntionality to refresh the list of available devices in NINA after a switch action. Use this to power on a switch like the Pegasus Astro power boxes, then refresh and connect to that switch. Now you can turn on the power to your camera, the USB port for the guide camera etc. Then use the refresh actions to find all the new devices and you can use the Connector plugin (separate plugin) to connnect to the newfound hardware. Please not that the password used for DL switches is transmitted in the clear, so we are also not encrypting it in the plugin itself.
-Please note that the Seqence items work regardless whether you use the switch driver or have another switch connected.")]
+[assembly: AssemblyMetadata("LongDescription", @"This plugin allows the control of Power Switches by Digital Logger Inc. It also provides functionality to refresh the list of available devices in NINA after a switch action. Use this to power on a switch like the Pegasus Astro power boxes, then refresh and connect to that switch. Now you can turn on the power to your camera, the USB port for the guide camera etc. Then use the refresh actions to find all the new devices and use the Connector plugin (separate plugin) to connnect to the newfound hardware. Please not that the password used for DL switches is transmitted in the clear, so we are also not encrypting it in the plugin itself.
+The Seqence items work regardless whether you use the switch driver or have another switch connected.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
