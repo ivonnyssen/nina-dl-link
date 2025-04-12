@@ -10,7 +10,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
@@ -78,7 +77,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         }
 
         /// <summary>
-        /// The number of the outlet that should be controlled. Outlet numbers start at 0.
+        /// The number of the outlet that should be controlled. Outlet numbers start at 1.
         /// </summary>
         private int outletNumber;
 

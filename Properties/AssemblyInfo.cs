@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // [MANDATORY] The following GUID is used as a unique identifier of the plugin. Generate a fresh one for your plugin!
@@ -36,22 +35,23 @@ using System.Runtime.InteropServices;
 // The following attributes are optional for the official manifest meta data
 
 //[Optional] Your plugin homepage URL - omit if not applicaple
-[assembly: AssemblyMetadata("Homepage", "https://github.com/ivonnyssen/nina-dl-link/wiki")]
+[assembly: AssemblyMetadata("Homepage", "https://ivonnyssen.github.io/nina-dl-link/")]
 
 //[Optional] Common tags that quickly describe your plugin
 [assembly: AssemblyMetadata("Tags", "")]
 
 //[Optional] A link that will show a log of all changes in between your plugin's versions
-[assembly: AssemblyMetadata("ChangelogURL", "https://github.com/ivonnyssen/nina-dl-link/CHANGELOG.md")]
+[assembly: AssemblyMetadata("ChangelogURL", "https://github.com/ivonnyssen/nina-dl-link/blob/main/CHANGELOG.md")]
 
 //[Optional] The url to a featured logo that will be displayed in the plugin list next to the name
-[assembly: AssemblyMetadata("FeaturedImageURL", "https://avatars.githubusercontent.com/u/14805118?s=200&v=4")]
+[assembly: AssemblyMetadata("FeaturedImageURL", "https://ivonnyssen.github.io/nina-dl-link/assets/dl-logo.png")]
 //[Optional] A url to an example screenshot of your plugin in action
-[assembly: AssemblyMetadata("ScreenshotURL", "")]
+[assembly: AssemblyMetadata("ScreenshotURL", "https://ivonnyssen.github.io/nina-dl-link/assets/DL-Link-Options.png")]
 //[Optional] An additional url to an example example screenshot of your plugin in action
-[assembly: AssemblyMetadata("AltScreenshotURL", "")]
+[assembly: AssemblyMetadata("AltScreenshotURL", "https://ivonnyssen.github.io/nina-dl-link/assets/DL-Link-Sequence.png")]
 //[Optional] An in-depth description of your plugin
-[assembly: AssemblyMetadata("LongDescription", @"")]
+[assembly: AssemblyMetadata("LongDescription", @"This plugin allows the control of Power Switches by Digital Logger Inc. It also provides fucntionality to refresh the list of available devices in NINA after a switch action. Use this to power on a switch like the Pegasus Astro power boxes, then refresh and connect to that switch. Now you can turn on the power to your camera, the USB port for the guide camera etc. Then use the refresh actions to find all the new devices and you can use the Connector plugin (separate plugin) to connnect to the newfound hardware. Please not that the password used for DL switches is transmitted in the clear, so we are also not encrypting it in the plugin itself.
+Please note that the Seqence items work regardless whether you use the switch driver or have another switch connected.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

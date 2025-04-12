@@ -152,7 +152,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 Times.Once(),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.Method == HttpMethod.Put &&
-                    req.RequestUri == new Uri("http://localhost/restapi/relay/outlets/1/state/") &&
+                    req.RequestUri == new Uri("http://localhost/restapi/relay/outlets/0/state/") &&
                     req.Content.ReadAsStringAsync().Result == "value=true"
                 ),
                 ItExpr.IsAny<CancellationToken>()
@@ -191,7 +191,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 Times.Once(),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.Method == HttpMethod.Put &&
-                    req.RequestUri == new Uri("http://localhost/restapi/relay/outlets/1/state/") &&
+                    req.RequestUri == new Uri("http://localhost/restapi/relay/outlets/0/state/") &&
                     req.Content.ReadAsStringAsync().Result == "value=true"
                 ),
                 ItExpr.IsAny<CancellationToken>()
@@ -227,7 +227,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 Times.Once(),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.Method == HttpMethod.Put &&
-                    req.RequestUri == new Uri("http://localhost/restapi/relay/outlets/1/state/") &&
+                    req.RequestUri == new Uri("http://localhost/restapi/relay/outlets/0/state/") &&
                     req.Content.ReadAsStringAsync().Result == "value=true"
                 ),
                 ItExpr.IsAny<CancellationToken>()

@@ -28,10 +28,6 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
 
     public class HttpUtils {
 
-        public static bool SetState(int outletNumber, OutletActions action) {
-            return true;
-        }
-
         public static async Task<Result<IList<string>>> GetOutletNames(HttpClient httpClient, string serverAddress, CancellationToken token) {
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -60,6 +56,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         public static async Task<Result<bool>> GetOutletState(HttpClient httpClient, string serverAddress, int outletNumber, CancellationToken token) {
+            //outlets in the API are 0-indexed, but the user sees them as 1-indexed
+            if (outletNumber < 1) {
+                Logger.Error($"Invalid outlet number: {outletNumber}");
+                return Result<bool>.Err();
+            } else {
+                outletNumber--;
+            }
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -89,6 +92,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         }
 
         public static async Task<Result<bool>> SetOutletState(HttpClient httpClient, string serverAddress, int outletNumber, bool valueToSet, CancellationToken token) {
+            //outlets in the API are 0-indexed, but the user sees them as 1-indexed
+            if (outletNumber < 1) {
+                Logger.Error($"Invalid outlet number: {outletNumber}");
+                return Result<bool>.Err();
+            } else {
+                outletNumber--;
+            }
             httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
 
             var content = new StringContent($"value={valueToSet.ToString().ToLower()}", System.Text.Encoding.ASCII, "application/x-www-form-urlencoded");
@@ -121,6 +131,13 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
                     return await SetOutletState(httpClient, serverAddress, outletNumber, false, token);
 
                 case OutletActions.Cycle:
+                    //outlets in the API are 0-indexed, but the user sees them as 1-indexed
+                    if (outletNumber < 1) {
+                        Logger.Error($"Invalid outlet number: {outletNumber}");
+                        return Result<bool>.Err();
+                    } else {
+                        outletNumber--;
+                    }
                     httpClient.DefaultRequestHeaders.Add("X-CSRF", "x");
                     Logger.Debug($"Cycling outlet {outletNumber}: ");
                     HttpResponseMessage response;

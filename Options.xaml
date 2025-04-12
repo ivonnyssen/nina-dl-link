@@ -6,21 +6,56 @@
     <!--  In order for this datatemplate to be picked correctly, the key has to follow the naming convention of <IPlugin.Name>_Options -->
     <!--  Furthermore the Resource Dictionary has to be exported via code behind export attributes  -->
     <DataTemplate x:Key="DL Link_Options">
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel Margin="0,20,0,20" Orientation="Horizontal">
-                    <TextBlock Text="Digital Logger Switch IP Address" />
-                    <TextBox MinWidth="50" Text="{Binding ServerAddress}" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Username" />
-                <TextBox MinWidth="50" Text="{Binding Username}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Password" />
-                <TextBox MinWidth="50" Text="{Binding Password}" />
-            </StackPanel>
-        </StackPanel>
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <!--  Spacer row  -->
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <!--  Spacer row  -->
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                Text="Digital Logger Switch IP Address" />
+            <TextBox
+                Grid.Row="0"
+                Grid.Column="1"
+                MinWidth="50"
+                Text="{Binding ServerAddress}" />
+
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                Text="Username" />
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                MinWidth="50"
+                Text="{Binding Username}" />
+
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                Text="Password" />
+            <TextBox
+                Grid.Row="4"
+                Grid.Column="1"
+                MinWidth="50"
+                Text="{Binding Password}" />
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>
