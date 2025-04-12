@@ -7,23 +7,21 @@ using System.Net;
 namespace IgorVonNyssen.NINA.DlLink.Tests {
 
     public class DlLinkInstructionTests {
+        private readonly Mock<ICameraMediator> mockCameraMediator = new();
+        private readonly Mock<IFocuserMediator> mockFocuserMediator = new();
+        private readonly Mock<IFilterWheelMediator> mockFilterWheelMediator = new();
+        private readonly Mock<ITelescopeMediator> mockTelescopeMediator = new();
+        private readonly Mock<IGuiderMediator> mockGuiderMediator = new();
+        private readonly Mock<IRotatorMediator> mockRotatorMediator = new();
+        private readonly Mock<IDomeMediator> mockDomeMediator = new();
+        private readonly Mock<ISwitchMediator> mockSwitchMediator = new();
+        private readonly Mock<IFlatDeviceMediator> mockFlatDeviceMediator = new();
+        private readonly Mock<IWeatherDataMediator> mockWeatherDataMediator = new();
+        private readonly Mock<ISafetyMonitorMediator> mockSafetyMonitorMediator = new();
 
         [Fact]
         public async Task Execute_ShouldNotThrowException_WhenOutletNumberIsInvalid() {
             // Arrange
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
-
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
                 mockCameraMediator.Object,
@@ -56,19 +54,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 .Respond(HttpStatusCode.InternalServerError); // Simulate failure
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
-
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
 
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
@@ -108,19 +93,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 .Respond("application/json", "true"); // Simulate outlet is already ON
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
-
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
 
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
@@ -164,19 +136,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 .Respond(HttpStatusCode.NoContent); // Simulate successful action
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
-
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
 
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
@@ -224,18 +183,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
 
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
-
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
                 mockCameraMediator.Object,
@@ -267,7 +214,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         }
 
         [Fact]
-        public void Execute_ShouldWaitForDelay_WhenDelayIsSpecified() {
+        public async Task Execute_ShouldWaitForDelay_WhenDelayIsSpecified() {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
             var serverAddress = "localhost";
@@ -282,19 +229,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
 
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
-
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
                 mockCameraMediator.Object,
@@ -313,8 +247,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 ServerAddress = serverAddress,
                 OutletNumber = outletNumber,
                 Action = OutletActions.On, // Desired state is ON
-                Rescan = Mediators.Switch, // Request rescan for switches
-                Delay = 5 // 5-second delay
+                Rescan = Mediators.Camera, // Request rescan for camera
+                Delay = 1 // 1-second delay
             };
 
             // Act
@@ -322,10 +256,25 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Assert
             Assert.False(task.IsCompleted); // Ensure the delay is respected
+            await Task.Delay(1500); // Wait for the delay to complete
+            Assert.True(task.IsCompleted);
+            mockCameraMediator.Verify(m => m.Rescan(), Times.Once);
         }
 
-        [Fact]
-        public async Task Execute_ShouldPerformRescan_ForAllMediators() {
+        [Theory]
+        [InlineData(Mediators.Camera)]
+        [InlineData(Mediators.Focuser)]
+        [InlineData(Mediators.FilterWheel)]
+        [InlineData(Mediators.Telescope)]
+        [InlineData(Mediators.Guider)]
+        [InlineData(Mediators.Rotator)]
+        [InlineData(Mediators.Dome)]
+        [InlineData(Mediators.Switch)]
+        [InlineData(Mediators.FlatDevice)]
+        [InlineData(Mediators.WeatherData)]
+        [InlineData(Mediators.SafetyMonitor)]
+        [InlineData(Mediators.None)]
+        public async Task Execute_ShouldPerformRescan_ForAllMediators(Mediators mediator) {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
             var serverAddress = "localhost";
@@ -340,19 +289,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
 
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
-
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(
                 mockCameraMediator.Object,
@@ -371,53 +307,76 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 ServerAddress = serverAddress,
                 OutletNumber = outletNumber,
                 Action = OutletActions.On, // Desired state is ON
+                Rescan = mediator, // Request rescan for the specified mediator
                 Delay = 0 // No delay for simplicity
             };
 
-            // Act & Assert for each mediator
-            instruction.Rescan = Mediators.Camera;
+            // Act
             await instruction.Execute(null, CancellationToken.None);
-            mockCameraMediator.Verify(m => m.Rescan(), Times.Once);
 
-            instruction.Rescan = Mediators.Focuser;
-            await instruction.Execute(null, CancellationToken.None);
-            mockFocuserMediator.Verify(m => m.Rescan(), Times.Once);
+            switch (mediator) {
+                case Mediators.Camera:
+                    mockCameraMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.FilterWheel;
-            await instruction.Execute(null, CancellationToken.None);
-            mockFilterWheelMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.Focuser:
+                    mockFocuserMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.Telescope;
-            await instruction.Execute(null, CancellationToken.None);
-            mockTelescopeMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.FilterWheel:
+                    mockFilterWheelMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.Guider;
-            await instruction.Execute(null, CancellationToken.None);
-            mockGuiderMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.Telescope:
+                    mockTelescopeMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.Rotator;
-            await instruction.Execute(null, CancellationToken.None);
-            mockRotatorMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.Guider:
+                    mockGuiderMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.Dome;
-            await instruction.Execute(null, CancellationToken.None);
-            mockDomeMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.Rotator:
+                    mockRotatorMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.Switch;
-            await instruction.Execute(null, CancellationToken.None);
-            mockSwitchMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.Dome:
+                    mockDomeMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.FlatDevice;
-            await instruction.Execute(null, CancellationToken.None);
-            mockFlatDeviceMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.Switch:
+                    mockSwitchMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.WeatherData;
-            await instruction.Execute(null, CancellationToken.None);
-            mockWeatherDataMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.FlatDevice:
+                    mockFlatDeviceMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
 
-            instruction.Rescan = Mediators.SafetyMonitor;
-            await instruction.Execute(null, CancellationToken.None);
-            mockSafetyMonitorMediator.Verify(m => m.Rescan(), Times.Once);
+                case Mediators.WeatherData:
+                    mockWeatherDataMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
+
+                case Mediators.SafetyMonitor:
+                    mockSafetyMonitorMediator.Verify(m => m.Rescan(), Times.Once);
+                    break;
+
+                case Mediators.None:
+                    mockCameraMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFocuserMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFilterWheelMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockTelescopeMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockGuiderMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockRotatorMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockDomeMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockSwitchMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFlatDeviceMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockWeatherDataMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockSafetyMonitorMediator.Verify(m => m.Rescan(), Times.Never);
+                    break;
+
+                default:
+                    Assert.Fail($"Unexpected mediator: {mediator}"); // Fail the test if an unexpected mediator is encountered
+                    break;
+            }
         }
 
         [Fact]
@@ -432,19 +391,6 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                 .Respond("application/json", "invalid_state"); // Simulate an invalid outlet state
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
-
-            // Mock mediators
-            var mockCameraMediator = new Mock<ICameraMediator>();
-            var mockFocuserMediator = new Mock<IFocuserMediator>();
-            var mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-            var mockTelescopeMediator = new Mock<ITelescopeMediator>();
-            var mockGuiderMediator = new Mock<IGuiderMediator>();
-            var mockRotatorMediator = new Mock<IRotatorMediator>();
-            var mockDomeMediator = new Mock<IDomeMediator>();
-            var mockSwitchMediator = new Mock<ISwitchMediator>();
-            var mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-            var mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-            var mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
 
             // Create an instruction with all mediators injected
             var instruction = new DlLinkInstruction(

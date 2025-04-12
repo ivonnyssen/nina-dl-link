@@ -1,24 +1,21 @@
-using Xunit;
+using IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems;
 using Moq;
 using NINA.Equipment.Interfaces.Mediator;
-using System.Threading;
-using System.Threading.Tasks;
-using IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems;
 
 namespace IgorVonNyssen.NINA.DlLink.Tests {
 
     public class DlLinkRescanTests {
-        private readonly Mock<ICameraMediator> mockCameraMediator = new Mock<ICameraMediator>();
-        private readonly Mock<IFocuserMediator> mockFocuserMediator = new Mock<IFocuserMediator>();
-        private readonly Mock<IFilterWheelMediator> mockFilterWheelMediator = new Mock<IFilterWheelMediator>();
-        private readonly Mock<ITelescopeMediator> mockTelescopeMediator = new Mock<ITelescopeMediator>();
-        private readonly Mock<IGuiderMediator> mockGuiderMediator = new Mock<IGuiderMediator>();
-        private readonly Mock<IRotatorMediator> mockRotatorMediator = new Mock<IRotatorMediator>();
-        private readonly Mock<IDomeMediator> mockDomeMediator = new Mock<IDomeMediator>();
-        private readonly Mock<ISwitchMediator> mockSwitchMediator = new Mock<ISwitchMediator>();
-        private readonly Mock<IFlatDeviceMediator> mockFlatDeviceMediator = new Mock<IFlatDeviceMediator>();
-        private readonly Mock<IWeatherDataMediator> mockWeatherDataMediator = new Mock<IWeatherDataMediator>();
-        private readonly Mock<ISafetyMonitorMediator> mockSafetyMonitorMediator = new Mock<ISafetyMonitorMediator>();
+        private readonly Mock<ICameraMediator> mockCameraMediator = new();
+        private readonly Mock<IFocuserMediator> mockFocuserMediator = new();
+        private readonly Mock<IFilterWheelMediator> mockFilterWheelMediator = new();
+        private readonly Mock<ITelescopeMediator> mockTelescopeMediator = new();
+        private readonly Mock<IGuiderMediator> mockGuiderMediator = new();
+        private readonly Mock<IRotatorMediator> mockRotatorMediator = new();
+        private readonly Mock<IDomeMediator> mockDomeMediator = new();
+        private readonly Mock<ISwitchMediator> mockSwitchMediator = new();
+        private readonly Mock<IFlatDeviceMediator> mockFlatDeviceMediator = new();
+        private readonly Mock<IWeatherDataMediator> mockWeatherDataMediator = new();
+        private readonly Mock<ISafetyMonitorMediator> mockSafetyMonitorMediator = new();
 
         [Theory]
         [InlineData(Mediators.Camera)]
@@ -115,7 +112,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                     break;
 
                 default:
-                    Assert.True(false, $"Unexpected mediator: {mediator}");
+                    Assert.Fail($"Unexpected mediator: {mediator}");
                     break;
             }
         }
