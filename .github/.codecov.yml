@@ -7,5 +7,6 @@ coverage:
   range: 80..100
 
 ignore:
-  - "**/Properties/*"
+  - "AssemblyInfo.cs"
+  - "Settings.Designer.cs"
   - "DlLink.cs"
