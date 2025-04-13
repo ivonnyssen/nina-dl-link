@@ -1,5 +1,8 @@
 ﻿# DL Link
 
+[![Tests](https://github.com/ivonnyssen/nina-dl-link/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ivonnyssen/nina-dl-link/actions/workflows/run-tests.yml)
+[![Codecov](https://codecov.io/github/ivonnyssen/nina-dl-link/coverage.svg?branch=main)](https://codecov.io/gh/ivonnyssen/nina-dl-link)
+
 ## Overview
 The DL Link plugin is a device driver for N.I.N.A. that allows you to control Digital Logger outlets. It provides functionality to turn-on, tunr-off and cycle outlets in the switch equipment section as well as in sequences.
 It also provides functionality to refresh the list of available devices in NINA after a switch action. The Seqence items work regardless whether you use the switch driver or have another switch connected.
