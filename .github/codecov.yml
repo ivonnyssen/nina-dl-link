@@ -1,6 +1,5 @@
 # ref: https://docs.codecov.com/docs/codecovyml-reference
 coverage:
-  require_ci_to_pass: true
   # Hold ourselves to a high bar
   range: 85..100
   round: down
