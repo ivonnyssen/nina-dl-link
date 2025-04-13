@@ -1,8 +1,8 @@
 using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
 using Moq;
 using NINA.Equipment.Interfaces;
-using System.Net;
 using RichardSzalay.MockHttp;
+using System.Net;
 
 namespace IgorVonNyssen.NINA.DlLink.Tests {
 

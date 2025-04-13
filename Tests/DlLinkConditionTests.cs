@@ -17,7 +17,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
 
             // Mock the HTTP response for the outlet state
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "true"); // Simulate the outlet being ON
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -46,7 +46,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
 
             // Mock the HTTP response for the outlet state
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "true"); // Simulate the outlet being ON
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -75,7 +75,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
 
             // Mock the HTTP response for the outlet state
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond(HttpStatusCode.NotFound);
 
             var httpClient = new HttpClient(mockHttpMessageHandler);
@@ -101,7 +101,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
 
             // Mock the HTTP response for the outlet state
-            mockHttpMessageHandler.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttpMessageHandler.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                 .Respond("application/json", "true"); // Simulate the outlet being ON
 
             var httpClient = new HttpClient(mockHttpMessageHandler);

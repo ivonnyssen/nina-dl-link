@@ -1,13 +1,7 @@
-using Xunit;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
 using IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems;
-using System.Collections.Generic;
 using RichardSzalay.MockHttp;
+using System.Net;
 
 namespace IgorVonNyssen.NINA.DlLink.Tests {
 
