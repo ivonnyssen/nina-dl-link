@@ -49,7 +49,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
             switch (await HttpUtils.GetOutletNames(httpClient, serverAddress, token)) {
                 case { IsOk: true, Value: var outletNames }:
                     switches.Clear();
-                    var counter = 0;
+                    var counter = 1; //user sees outlets as 1-indexed
                     foreach (var outletName in outletNames) {
                         switches.Add(new DlOutlet(outletName, counter));
                         counter++;
