@@ -18,7 +18,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             // Arrange
             var serverAddress = "localhost";
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
                     .Respond(HttpStatusCode.MultiStatus, "application/json", "[\"Outlet1\", \"Outlet2\"]");
 
             var mockHttpClient = new HttpClient(mockHttp);
@@ -38,7 +38,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             // Arrange
             var serverAddress = "localhost";
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
                     .Respond(HttpStatusCode.BadRequest);
 
             var mockHttpClient = new HttpClient(mockHttp);
@@ -58,7 +58,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var serverAddress = "localhost";
             var outletNumber = 1;
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                     .Respond("application/json", "true");
 
             var mockHttpClient = new HttpClient(mockHttp);
@@ -93,7 +93,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
             var valueToSet = true;
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
                     .Respond(HttpStatusCode.NoContent);
 
             var mockHttpClient = new HttpClient(mockHttp);
@@ -114,7 +114,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             var outletNumber = 1;
             var action = OutletActions.Cycle;
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/cycle/")
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/cycle/")
                     .Respond(HttpStatusCode.NoContent);
 
             var mockHttpClient = new HttpClient(mockHttp);
