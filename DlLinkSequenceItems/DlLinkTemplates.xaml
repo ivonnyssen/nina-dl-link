@@ -59,7 +59,7 @@
                             <TextBox.Text>
                                 <Binding Mode="TwoWay" Path="OutletNumber">
                                     <Binding.ValidationRules>
-                                        <rules:GreaterThanZeroRule />
+                                        <local:IntGreaterOrEqualToOne />
                                     </Binding.ValidationRules>
                                 </Binding>
                             </TextBox.Text>
@@ -119,7 +119,7 @@
                             <TextBox.Text>
                                 <Binding Mode="TwoWay" Path="OutletNumber">
                                     <Binding.ValidationRules>
-                                        <rules:GreaterThanZeroRule />
+                                        <local:IntGreaterOrEqualToOne />
                                     </Binding.ValidationRules>
                                 </Binding>
                             </TextBox.Text>
@@ -175,8 +175,15 @@
                         <TextBox
                             MinWidth="40"
                             Margin="5,0,0,0"
-                            Text="{Binding OutletNumber}"
-                            TextAlignment="Right" />
+                            TextAlignment="Right">
+                            <TextBox.Text>
+                                <Binding Mode="TwoWay" Path="OutletNumber">
+                                    <Binding.ValidationRules>
+                                        <local:IntGreaterOrEqualToOne />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="State" />
@@ -199,10 +206,15 @@
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="Outlet Number" />
-                        <TextBox
-                            MinWidth="40"
-                            Text="{Binding OutletNumber}"
-                            TextAlignment="Right" />
+                        <TextBox MinWidth="40" TextAlignment="Right">
+                            <TextBox.Text>
+                                <Binding Mode="TwoWay" Path="OutletNumber">
+                                    <Binding.ValidationRules>
+                                        <local:IntGreaterOrEqualToOne />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Text="State" />
