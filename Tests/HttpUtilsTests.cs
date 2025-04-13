@@ -28,7 +28,9 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Assert
             Assert.True(result.IsOk);
-            Assert.Equal(new List<string> { "Outlet1", "Outlet2" }, result.Value);
+            Assert.Equal(["Outlet1", "Outlet2"], result.Value);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -46,6 +48,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Assert
             Assert.True(result.IsErr);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -65,6 +69,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             // Assert
             Assert.True(result.IsOk);
             Assert.True(result.Value);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -97,6 +103,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Assert
             Assert.True(result.IsOk);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -116,6 +124,8 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Assert
             Assert.True(result.IsOk);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
@@ -158,6 +168,50 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
 
             // Assert
             Assert.True(result.IsErr);
+        }
+
+        [Fact]
+        public async Task TriggerOutletAction_ShouldSendCorrectRequest_WhenResponseIsSuccessful() {
+            // Arrange
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+            var action = OutletActions.On;
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect(HttpMethod.Put, $"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                .WithContent("value=true")
+                .Respond(HttpStatusCode.NoContent); // Simulate successful action
+
+            var httpClient = new HttpClient(mockHttp);
+
+            // Act
+            var result = await HttpUtils.TriggerOutletAction(httpClient, "localhost", outletNumber, action, default);
+
+            // Assert
+            Assert.True(result.IsOk);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
+        }
+
+        [Fact]
+        public async Task TriggerOutletAction_ShouldReturnError_WhenResponseIsUnsuccessful() {
+            // Arrange
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+            var action = OutletActions.On;
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect(HttpMethod.Put, $"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                .WithContent("value=true")
+                .Respond(HttpStatusCode.BadRequest); // Simulate failure
+
+            var httpClient = new HttpClient(mockHttp);
+
+            // Act
+            var result = await HttpUtils.TriggerOutletAction(httpClient, "localhost", outletNumber, action, default);
+
+            // Assert
+            Assert.False(result.IsOk);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
     }
 }
