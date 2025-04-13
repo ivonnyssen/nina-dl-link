@@ -19,7 +19,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         public IList<ISwitchHub> GetEquipment() {
             var serverAddress = Properties.Settings.Default.ServerAddress;
             var devices = new List<ISwitchHub> {
-                new DlLinkDriver($"{serverAddress}")
+                //    new DlLinkDriver($"{serverAddress}")
             };
 
             return devices;
