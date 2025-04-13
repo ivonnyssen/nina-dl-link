@@ -23,7 +23,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
 
         [ImportingConstructor]
         public DlLinkCondition() {
-            outletNumber = 0;
+            outletNumber = 1; //outlet numbers start at 1
             state = OutletStates.On;
         }
 
@@ -35,7 +35,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         [JsonProperty]
         public int OutletNumber {
             get => outletNumber; set {
-                outletNumber = value < 0 ? 0 : value;
+                outletNumber = value < 1 ? 1 : value;
                 RaisePropertyChanged();
             }
         }

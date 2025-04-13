@@ -79,7 +79,7 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// <summary>
         /// The number of the outlet that should be controlled. Outlet numbers start at 1.
         /// </summary>
-        private int outletNumber;
+        private int outletNumber = 1;
 
         [JsonProperty]
         public int OutletNumber { get => outletNumber; set { outletNumber = value; RaisePropertyChanged(); } }

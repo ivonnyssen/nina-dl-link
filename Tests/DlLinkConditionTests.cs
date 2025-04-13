@@ -154,7 +154,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         }
 
         [Fact]
-        public void OutletNumber_ShouldClampNegativeValuesToZero() {
+        public void OutletNumber_ShouldClampNegativeValuesToOne() {
             // Arrange
             var condition = new DlLinkCondition();
 
@@ -162,7 +162,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             condition.OutletNumber = -5;
 
             // Assert
-            Assert.Equal(0, condition.OutletNumber);
+            Assert.Equal(1, condition.OutletNumber);
         }
     }
 }
