@@ -1,7 +1,7 @@
 using IgorVonNyssen.NINA.DlLink.DlLinkDrivers;
 using Moq;
-using Moq.Protected;
 using NINA.Equipment.Interfaces;
+using RichardSzalay.MockHttp;
 using System.Net;
 
 namespace IgorVonNyssen.NINA.DlLink.Tests {
@@ -11,23 +11,14 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         [Fact]
         public async Task Connect_ShouldReturnTrue_WhenResponseIsSuccessful() {
             // Arrange
-            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage {
-                    StatusCode = HttpStatusCode.MultiStatus,
-                    Content = new StringContent("[\"Outlet1\", \"Outlet2\"]")
-                })
-                .Verifiable();
+            var serverAddress = "localhost";
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+                    .Respond(HttpStatusCode.MultiStatus, "application/json", "[\"Outlet1\", \"Outlet2\"]");
 
-            var httpClient = new HttpClient(handlerMock.Object);
+            var mockHttpClient = new HttpClient(mockHttp);
 
-            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var dlLinkDriver = new DlLinkDriver("TestDevice", mockHttpClient, "localhost");
 
             // Act
             var result = await dlLinkDriver.Connect(CancellationToken.None);
@@ -36,28 +27,21 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.True(result);
             Assert.True(dlLinkDriver.Connected);
             Assert.Equal(2, ((ISwitchHub)dlLinkDriver).Switches.Count);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
         public async Task Connect_ShouldReturnFalse_WhenResponseIsUnsuccessful() {
             // Arrange
-            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Content = new StringContent("Bad Request")
-                })
-                .Verifiable();
+            var serverAddress = "localhost";
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+                    .Respond(HttpStatusCode.BadRequest);
 
-            var httpClient = new HttpClient(handlerMock.Object);
+            var mockHttpClient = new HttpClient(mockHttp);
 
-            var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
+            var dlLinkDriver = new DlLinkDriver("TestDevice", mockHttpClient, "localhost");
 
             // Act
             var result = await dlLinkDriver.Connect(CancellationToken.None);
@@ -66,26 +50,19 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.False(result);
             Assert.False(dlLinkDriver.Connected);
             Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
         public async Task Connect_ShouldReturnWithoutOutlets_WhenResponseIsEmpty() {
             // Arrange
-            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage {
-                    StatusCode = HttpStatusCode.MultiStatus,
-                    Content = new StringContent("[]")
-                })
-                .Verifiable();
+            var serverAddress = "localhost";
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+                    .Respond(HttpStatusCode.MultiStatus, "application/json", "[]");
 
-            var httpClient = new HttpClient(handlerMock.Object);
+            var httpClient = new HttpClient(mockHttp);
 
             var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
@@ -96,26 +73,19 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.True(result);
             Assert.True(dlLinkDriver.Connected);
             Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
         public async Task Connect_ShouldReturnFalse_WhenResponseIsInvalidJson() {
             // Arrange
-            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage {
-                    StatusCode = HttpStatusCode.MultiStatus,
-                    Content = new StringContent("")
-                })
-                .Verifiable();
+            var serverAddress = "localhost";
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+                    .Respond(HttpStatusCode.MultiStatus, "application/json", "");
 
-            var httpClient = new HttpClient(handlerMock.Object);
+            var httpClient = new HttpClient(mockHttp);
 
             var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
@@ -126,23 +96,19 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.False(result);
             Assert.False(dlLinkDriver.Connected);
             Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
         }
 
         [Fact]
         public async Task Connect_ShouldReturnFalse_WhenServerTimesOut() {
             // Arrange
-            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ThrowsAsync(new TaskCanceledException())
-                .Verifiable();
+            var serverAddress = "localhost";
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/all;/name/")
+                    .Throw(new TaskCanceledException());
 
-            var httpClient = new HttpClient(handlerMock.Object);
+            var httpClient = new HttpClient(mockHttp);
 
             var dlLinkDriver = new DlLinkDriver("TestDevice", httpClient, "localhost");
 
@@ -153,6 +119,28 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.False(result);
             Assert.False(dlLinkDriver.Connected);
             Assert.Empty(((ISwitchHub)dlLinkDriver).Switches);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
+        }
+
+        [Fact]
+        public void Disconnect_ShouldClearSwitches() {
+            // Arrange
+            var mockHttpClient = new Mock<HttpClient>();
+            var dlLinkDriver = new DlLinkDriver("TestDevice", mockHttpClient.Object, "localhost");
+
+            // Simulate adding switches to the collection
+            var switches = (ICollection<ISwitch>)((ISwitchHub)dlLinkDriver).Switches;
+            switches.Add(new DlOutlet("Outlet1", 0));
+            switches.Add(new DlOutlet("Outlet2", 1));
+
+            Assert.Equal(2, switches.Count); // Ensure switches are added
+
+            // Act
+            dlLinkDriver.Disconnect();
+
+            // Assert
+            Assert.Empty(switches); // Ensure switches are cleared
         }
     }
 }
