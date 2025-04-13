@@ -10,8 +10,12 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <!--  Spacer row  -->
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="20" />
                 <!--  Spacer row  -->
@@ -26,12 +30,18 @@
                 Grid.Column="0"
                 Margin="0,0,10,0"
                 VerticalAlignment="Center"
-                Text="Digital Logger Switch IP Address" />
+                Text="Digital Logger Address" />
             <TextBox
                 Grid.Row="0"
                 Grid.Column="1"
                 MinWidth="50"
                 Text="{Binding ServerAddress}" />
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="2"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="The IP address or the host name of the Digital Logger switch." />
 
             <TextBlock
                 Grid.Row="2"
@@ -44,6 +54,12 @@
                 Grid.Column="1"
                 MinWidth="50"
                 Text="{Binding Username}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="The same user name you are using in the web UI of the Digital Logger switch." />
 
             <TextBlock
                 Grid.Row="4"
@@ -56,6 +72,30 @@
                 Grid.Column="1"
                 MinWidth="50"
                 Text="{Binding Password}" />
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="2"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="The same password you are using in the web UI." />
+
+            <TextBlock
+                Grid.Row="6"
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                Text="Hide Switch Hub" />
+            <CheckBox
+                Grid.Row="6"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                IsChecked="{Binding HideSwitchhub}" />
+            <TextBlock
+                Grid.Row="6"
+                Grid.Column="2"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="Use this if you want to make another switch hub the default. Refresh the list of Switch hubs after changing this setting." />
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

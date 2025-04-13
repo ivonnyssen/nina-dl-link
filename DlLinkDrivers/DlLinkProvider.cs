@@ -12,17 +12,14 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
     [Export(typeof(IEquipmentProvider))]
     [method: ImportingConstructor]
     public class DlLinkProvider(IProfileService profileService) : IEquipmentProvider<ISwitchHub> {
-        private readonly IProfileService profileService = profileService; //do not remove this - provider does not get found by NINA otherwise
+        private readonly IProfileService profileService = profileService;
 
         public string Name => "DL Link";
 
         public IList<ISwitchHub> GetEquipment() {
-            var serverAddress = Properties.Settings.Default.ServerAddress;
-            var devices = new List<ISwitchHub> {
-                //    new DlLinkDriver($"{serverAddress}")
-            };
-
-            return devices;
+            return Properties.Settings.Default.HideSwitchhub
+                ? []
+                : (IList<ISwitchHub>)[new DlLinkDriver($"{Properties.Settings.Default.ServerAddress}")];
         }
     }
 }

@@ -70,5 +70,17 @@ namespace IgorVonNyssen.NINA.DlLink.Properties {
                 this["Password"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HideSwitchhub {
+            get {
+                return ((bool)(this["HideSwitchhub"]));
+            }
+            set {
+                this["HideSwitchhub"] = value;
+            }
+        }
     }
 }
