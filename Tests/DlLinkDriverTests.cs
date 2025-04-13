@@ -27,6 +27,10 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.True(result);
             Assert.True(dlLinkDriver.Connected);
             Assert.Equal(2, ((ISwitchHub)dlLinkDriver).Switches.Count);
+            Assert.Equal("Outlet1", ((ISwitchHub)dlLinkDriver).Switches.ElementAt(0).Name);
+            Assert.Equal(1, ((DlOutlet)((ISwitchHub)dlLinkDriver).Switches.ElementAt(0)).OutletNumber);
+            Assert.Equal("Outlet2", ((ISwitchHub)dlLinkDriver).Switches.ElementAt(1).Name);
+            Assert.Equal(2, ((DlOutlet)((ISwitchHub)dlLinkDriver).Switches.ElementAt(1)).OutletNumber);
             mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
             mockHttp.VerifyNoOutstandingRequest();
         }
