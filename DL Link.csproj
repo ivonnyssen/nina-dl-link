@@ -35,7 +35,7 @@
     <Folder Include="docs\assets\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".github\.codecov.yml" />
+    <None Include=".github\codecov.yml" />
     <None Include=".github\workflows\build-and-release-plugin.yaml" />
     <None Include=".github\workflows\run-tests.yml" />
   </ItemGroup>
