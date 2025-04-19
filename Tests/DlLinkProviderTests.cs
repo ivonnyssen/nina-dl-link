@@ -19,6 +19,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.NotNull(equipment);
             Assert.Single(equipment); // Ensure only one device is returned
             Assert.IsType<DlLinkDriver>(equipment[0]); // Ensure the device is a DlLinkDriver
+            Assert.Equal("DL Link", provider.Name); // Ensure the name is correct
         }
     }
 }
