@@ -274,6 +274,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         [InlineData(Mediators.WeatherData)]
         [InlineData(Mediators.SafetyMonitor)]
         [InlineData(Mediators.None)]
+        [InlineData((Mediators)999)]
         public async Task Execute_ShouldPerformRescan_ForAllMediators(Mediators mediator) {
             // Arrange
             var mockHttpMessageHandler = new MockHttpMessageHandler();
@@ -373,6 +374,22 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                     mockSafetyMonitorMediator.Verify(m => m.Rescan(), Times.Never);
                     break;
 
+                case (Mediators)999:
+                    // This case is for an unexpected mediator value
+                    // it should not touch any of the mediators
+                    mockCameraMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFocuserMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFilterWheelMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockTelescopeMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockGuiderMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockRotatorMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockDomeMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockSwitchMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFlatDeviceMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockWeatherDataMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockSafetyMonitorMediator.Verify(m => m.Rescan(), Times.Never);
+                    break;
+
                 default:
                     Assert.Fail($"Unexpected mediator: {mediator}"); // Fail the test if an unexpected mediator is encountered
                     break;
@@ -418,6 +435,40 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             // Assert
             mockHttpMessageHandler.VerifyNoOutstandingExpectation(); // Ensure no unexpected requests were made
             mockHttpMessageHandler.VerifyNoOutstandingRequest();
+        }
+
+        [Fact]
+        public void Clone_ShouldReturnIdenticalObject() {
+            // Arrange
+            var instruction = new DlLinkInstruction(
+                mockCameraMediator.Object,
+                mockFocuserMediator.Object,
+                mockFilterWheelMediator.Object,
+                mockTelescopeMediator.Object,
+                mockGuiderMediator.Object,
+                mockRotatorMediator.Object,
+                mockDomeMediator.Object,
+                mockSwitchMediator.Object,
+                mockFlatDeviceMediator.Object,
+                mockWeatherDataMediator.Object,
+                mockSafetyMonitorMediator.Object
+            ) {
+                OutletNumber = 5,
+                Action = OutletActions.On,
+                Delay = 10,
+                Rescan = Mediators.Camera
+            };
+
+            // Act
+            var clone = (DlLinkInstruction)instruction.Clone();
+
+            // Assert
+            Assert.NotNull(clone);
+            Assert.NotSame(instruction, clone); // Ensure it's a different instance
+            Assert.Equal(instruction.OutletNumber, clone.OutletNumber);
+            Assert.Equal(instruction.Action, clone.Action);
+            Assert.Equal(instruction.Delay, clone.Delay);
+            Assert.Equal(instruction.Rescan, clone.Rescan);
         }
     }
 }
