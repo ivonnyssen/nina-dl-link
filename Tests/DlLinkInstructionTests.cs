@@ -470,5 +470,39 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             Assert.Equal(instruction.Delay, clone.Delay);
             Assert.Equal(instruction.Rescan, clone.Rescan);
         }
+
+        [Fact]
+        public void ToString_ShouldReturnCorrectString() {
+            // Arrange
+            var instruction = new DlLinkInstruction(
+                mockCameraMediator.Object,
+                mockFocuserMediator.Object,
+                mockFilterWheelMediator.Object,
+                mockTelescopeMediator.Object,
+                mockGuiderMediator.Object,
+                mockRotatorMediator.Object,
+                mockDomeMediator.Object,
+                mockSwitchMediator.Object,
+                mockFlatDeviceMediator.Object,
+                mockWeatherDataMediator.Object,
+                mockSafetyMonitorMediator.Object
+            ) {
+                OutletNumber = 3,
+                Action = OutletActions.Cycle,
+                Delay = 5,
+                Rescan = Mediators.Telescope
+            };
+
+            // Act
+            var result = instruction.ToString();
+
+            // Assert
+            Assert.Contains("Category:", result);
+            Assert.Contains("Item: DlLinkInstruction", result);
+            Assert.Contains("Outlet: 3", result);
+            Assert.Contains("Action: Cycle", result);
+            Assert.Contains("Delay: 5", result);
+            Assert.Contains("Rescan: Telescope", result);
+        }
     }
 }
