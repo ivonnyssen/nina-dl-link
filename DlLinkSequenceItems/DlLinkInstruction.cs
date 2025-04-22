@@ -211,7 +211,23 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkSequenceItems {
         /// </summary>
         /// <returns></returns>
         public override object Clone() {
-            return new DlLinkInstruction(this, cameraMediator, focuserMediator, filterWheelMediator, telescopeMediator, guiderMediator, rotatorMediator, domeMediator, switchMediator, flatDeviceMediator, weatherDataMediator, safetyMonitorMediator);
+            return new DlLinkInstruction(this,
+                cameraMediator,
+                focuserMediator,
+                filterWheelMediator,
+                telescopeMediator,
+                guiderMediator,
+                rotatorMediator,
+                domeMediator,
+                switchMediator,
+                flatDeviceMediator,
+                weatherDataMediator,
+                safetyMonitorMediator) {
+                OutletNumber = OutletNumber,
+                Action = Action,
+                Delay = Delay,
+                Rescan = Rescan
+            };
         }
 
         /// <summary>

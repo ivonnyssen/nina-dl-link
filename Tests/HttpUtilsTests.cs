@@ -283,5 +283,44 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
             mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
             mockHttp.VerifyNoOutstandingRequest();
         }
+
+        [Fact]
+        public async Task SetOutletState_ShouldReturnErrorWhenRequestIsCancelled() {
+            // Arrange
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+            var valueToSet = true;
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                    .Respond(HttpStatusCode.NoContent); // Simulate successful action
+            var mockHttpClient = new HttpClient(mockHttp);
+            var cts = new CancellationTokenSource();
+            cts.Cancel(); // Cancel the token before the request is made
+            // Act
+            var result = await HttpUtils.SetOutletState(mockHttpClient, serverAddress, outletNumber, valueToSet, cts.Token);
+            // Assert
+            Assert.True(result.IsErr);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
+        }
+
+        [Fact]
+        public async Task GetOutletState_ShouldReturnErrorWhenRequestIsCancelled() {
+            // Arrange
+            var serverAddress = "localhost";
+            var outletNumber = 1;
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.Expect($"http://{serverAddress}/restapi/relay/outlets/{outletNumber - 1}/state/")
+                    .Respond(HttpStatusCode.NoContent); // Simulate successful action
+            var mockHttpClient = new HttpClient(mockHttp);
+            var cts = new CancellationTokenSource();
+            cts.Cancel(); // Cancel the token before the request is made
+            // Act
+            var result = await HttpUtils.GetOutletState(mockHttpClient, serverAddress, outletNumber, cts.Token);
+            // Assert
+            Assert.True(result.IsErr);
+            mockHttp.VerifyNoOutstandingExpectation(); // Ensure the request was made
+            mockHttp.VerifyNoOutstandingRequest();
+        }
     }
 }

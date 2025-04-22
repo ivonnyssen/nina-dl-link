@@ -61,10 +61,10 @@ namespace IgorVonNyssen.NINA.DlLink {
             }
         }
 
-        public bool HideSwitchhub {
-            get => Settings.Default.HideSwitchhub;
+        public bool ShowSwitchHub {
+            get => Settings.Default.ShowSwitchHub;
             set {
-                Settings.Default.HideSwitchhub = value;
+                Settings.Default.ShowSwitchHub = value;
                 CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }

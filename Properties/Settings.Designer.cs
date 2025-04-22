@@ -73,13 +73,13 @@ namespace IgorVonNyssen.NINA.DlLink.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool HideSwitchhub {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowSwitchHub {
             get {
-                return ((bool)(this["HideSwitchhub"]));
+                return ((bool)(this["ShowSwitchHub"]));
             }
             set {
-                this["HideSwitchhub"] = value;
+                this["ShowSwitchHub"] = value;
             }
         }
     }

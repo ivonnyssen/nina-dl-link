@@ -30,6 +30,7 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
         [InlineData(Mediators.WeatherData)]
         [InlineData(Mediators.SafetyMonitor)]
         [InlineData(Mediators.None)]
+        [InlineData((Mediators)999)]
         public async Task Execute_ShouldCallCorrectMediator_WhenRescanIsSet(Mediators mediator) {
             // Arrange
             var rescan = new DlLinkRescan(
@@ -98,6 +99,22 @@ namespace IgorVonNyssen.NINA.DlLink.Tests {
                     break;
 
                 case Mediators.None:
+                    mockCameraMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFocuserMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFilterWheelMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockTelescopeMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockGuiderMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockRotatorMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockDomeMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockSwitchMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockFlatDeviceMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockWeatherDataMediator.Verify(m => m.Rescan(), Times.Never);
+                    mockSafetyMonitorMediator.Verify(m => m.Rescan(), Times.Never);
+                    break;
+
+                case (Mediators)999:
+                    // This case is for an unexpected mediator value
+                    // it should not touch any of the mediators
                     mockCameraMediator.Verify(m => m.Rescan(), Times.Never);
                     mockFocuserMediator.Verify(m => m.Rescan(), Times.Never);
                     mockFilterWheelMediator.Verify(m => m.Rescan(), Times.Never);
