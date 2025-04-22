@@ -1,0 +1,47 @@
+﻿<ResourceDictionary
+    x:Class="IgorVonNyssen.NINA.DlLink.DlLinkDockables.MyPluginDockableTemplates"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:alt="clr-namespace:NINA.WPF.Base.View;assembly=NINA.WPF.Base"
+    xmlns:local="clr-namespace:IgorVonNyssen.NINA.DlLink.DlLinkDockables"
+    xmlns:mini="clr-namespace:NINA.View.Sequencer.MiniSequencer;assembly=NINA.Sequencer"
+    xmlns:nina="clr-namespace:NINA.View.Sequencer;assembly=NINA.Sequencer"
+    xmlns:util="clr-namespace:NINA.Core.Utility;assembly=NINA.Core">
+
+    <!--  The datatemplate for the dockable is indicated by the fully qualified class name and the postfix _Dockable  -->
+    <DataTemplate x:Key="IgorVonNyssen.NINA.DlLink.DlLinkDockables.DlLinkDockable_Dockable">
+        <Grid Margin="5">
+            <ItemsControl ItemsSource="{Binding Switches}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <!--  For CheckBox  -->
+                                <ColumnDefinition Width="Auto" />
+                                <!--  For TextBlock  -->
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                Grid.Column="0"
+                                Margin="0,0,10,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding IsChecked}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="{Binding Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </DataTemplate>
+
+    <!--  This geometrygroup defines a custom SVG to be used with the plugin dockable  -->
+    <GeometryGroup x:Key="IgorVonNyssen.NINA.DlLink_LogoSVG">
+        <PathGeometry Figures="M 5591 3869 C 5591 3924 5576 3979 5549 4027 C 5521 4075 5481 4115 5433 4143 C 5385 4170 5330 4185 5275 4185 C 5219 4185 5164 4170 5116 4143 C 5068 4115 5028 4075 5000 4027 C 4973 3979 4958 3924 4958 3869 C 4958 3813 4973 3758 5000 3710 C 5028 3662 5068 3622 5116 3594 C 5164 3567 5219 3552 5275 3552 C 5330 3552 5385 3567 5433 3594 C 5481 3622 5521 3662 5549 3710 C 5576 3758 5591 3813 5591 3868 L 5591 3869 Z" />
+        <PathGeometry Figures="M 3908 3462 L 2695 6792 L 4686 7479 L 4697 7479 L 3908 3462 Z" />
+        <PathGeometry Figures="m 4795.46 8618.78 q 0 300.389 -118.502 524.991 q -117.124 223.225 -333.459 341.726 Q 4128.54 9604 3850.2 9604 H 3064.78 V 7662.5 h 702.744 q 490.543 0 759.239 248.027 q 268.696 246.649 268.696 708.256 z m -409.245 0 q 0 -312.79 -162.596 -476.764 q -162.596 -165.352 -464.362 -165.352 h -287.987 v 1313.17 h 344.482 q 261.807 0 416.135 -180.509 q 154.328 -180.509 154.328 -490.543 z M 5102.73 9604 V 7662.5 h 406.489 V 9289.83 H 6550.94 V 9604 Z m 1723.79 0 V 7662.5 h 406.489 V 9604 Z" />
+    </GeometryGroup>
+</ResourceDictionary>

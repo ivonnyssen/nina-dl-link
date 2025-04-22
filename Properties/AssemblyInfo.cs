@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // [MANDATORY] The following GUID is used as a unique identifier of the plugin. Generate a fresh one for your plugin!
@@ -63,3 +64,4 @@ The Seqence items work regardless whether you use the switch driver or have anot
 [assembly: AssemblyTrademark("")]
 // [Unused]
 [assembly: AssemblyCulture("")]
+[assembly: InternalsVisibleTo("Tests")]

@@ -1,4 +1,5 @@
-﻿using NINA.Equipment.Interfaces;
+﻿using NINA.Core.Utility;
+using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Profile.Interfaces;
 using System.Collections.Generic;
@@ -17,9 +18,10 @@ namespace IgorVonNyssen.NINA.DlLink.DlLinkDrivers {
         public string Name => "DL Link";
 
         public IList<ISwitchHub> GetEquipment() {
-            return Properties.Settings.Default.HideSwitchhub
-                ? []
-                : (IList<ISwitchHub>)[new DlLinkDriver($"{Properties.Settings.Default.ServerAddress}")];
+            Logger.Debug($"DlLinkProvider: GetEquipment called. ShowSwitchHub: {Properties.Settings.Default.ShowSwitchHub}");
+            return Properties.Settings.Default.ShowSwitchHub
+                ? (IList<ISwitchHub>)[new DlLinkDriver($"{Properties.Settings.Default.ServerAddress}")]
+                : [];
         }
     }
 }
